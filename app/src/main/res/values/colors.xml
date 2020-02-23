@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAccent">#19DF07</color>
+    <color name="colorPrimary">#22C114</color>
+    <color name="colorPrimaryDark">#15AB07</color>
+
+    // Other Dependant Color
+    <color name="dark_grey">#707B7C</color>
+    <color name="error">#FF0000</color>
+    <color name="light_grey">#EBEDEF</color>
+    <color name="lightGreen">#ABEBC6</color>
+    <color name="brown">#D18B49</color>
+</resources>
