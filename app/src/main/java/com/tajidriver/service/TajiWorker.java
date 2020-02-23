@@ -1,15 +1,15 @@
-package com.tajidriver.services;
+package com.tajidriver.service;
 
 import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.work.ListenableWorker;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 public class TajiWorker extends Worker {
-
-    private static final String TAG = "MyWorker";
+    private static final String TAG = "TajiWorker";
 
     public TajiWorker(@NonNull Context appContext, @NonNull WorkerParameters workerParams) {
         super(appContext, workerParams);
@@ -20,6 +20,6 @@ public class TajiWorker extends Worker {
     public Result doWork() {
         Log.d(TAG, "Performing long running task in scheduled job");
         // TODO(developer): add long running task here.
-        return Result.success();
+        return ListenableWorker.Result.success();
     }
 }

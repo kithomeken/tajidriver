@@ -43,6 +43,19 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/new_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:layout_gravity="bottom|end"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:layout_marginStart="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginBottom="220dp"
+            app:srcCompat="@drawable/ic_geo_location" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/geo_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

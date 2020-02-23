@@ -1,4 +1,4 @@
-package com.tajidriver.services;
+package com.tajidriver.service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,20 +8,19 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import androidx.core.app.NotificationCompat;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.tajidriver.DriverHome;
 import com.tajidriver.R;
 
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-
-public class TajiMessagingService extends FirebaseMessagingService {
-
-    private static final String TAG = "MyFirebaseMsgService";
+public class MessagingService extends FirebaseMessagingService {
+    private static final String TAG = "TajiMessagingServices";
 
     /**
      * Called when message is received.
@@ -62,21 +61,13 @@ public class TajiMessagingService extends FirebaseMessagingService {
                 // Handle message within 10 seconds
                 handleNow();
             }
-
         }
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
-    // [END receive_message]
-
-
-    // [START on_new_token]
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -92,7 +83,6 @@ public class TajiMessagingService extends FirebaseMessagingService {
         // Instance ID token to your app server.
         sendRegistrationToServer(token);
     }
-    // [END on_new_token]
 
     /**
      * Schedule async work using WorkManager.
