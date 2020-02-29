@@ -72,4 +72,10 @@ dependencies {
 
     //  Google Sign In SDK
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
+
+    // Volley
+    implementation 'com.android.volley:volley:1.1.0'
+
+    // Draw GIF
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
 }

@@ -1,23 +1,26 @@
-package com.tajidriver;
+package com.tajidriver.driver;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.tajidriver.R;
 import com.tajidriver.configuration.Firebase;
+import com.tajidriver.service.MessagingServices;
+
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.text.TextUtils;
@@ -29,7 +32,10 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tajidriver.configuration.TajiCabs.PASSENGER_DETAILS;
+import static com.tajidriver.configuration.TajiCabs.DRIVER_DETAILS;
+import static com.tajidriver.configuration.TajiCabs.EMAIL;
+import static com.tajidriver.configuration.TajiCabs.NAMES;
+import static com.tajidriver.configuration.TajiCabs.PHONE;
 
 public class SignUpActivity extends Firebase implements View.OnClickListener {
     private static final String TAG = "Sign Up Activity";
@@ -162,20 +168,20 @@ public class SignUpActivity extends Firebase implements View.OnClickListener {
             passwordText.setError(null);
         }
 
-//        String confirmPwd = confirmText.getText().toString();
-//        if (TextUtils.isEmpty(confirmPwd)) {
-//            confirmText.setError("Required.");
-//            valid = false;
-//        } else {
-//            confirmText.setError(null);
-//        }
-//
-//        if (!password.equals(confirmPwd)) {
-//            passwordText.setError("Passwords Do Not Match");
-//            valid = false;
-//        } else {
-//            passwordText.setError(null);
-//        }
+        String confirmPwd = confirmText.getText().toString();
+        if (TextUtils.isEmpty(confirmPwd)) {
+            confirmText.setError("Required.");
+            valid = false;
+        } else {
+            confirmText.setError(null);
+        }
+
+        if (!password.equals(confirmPwd)) {
+            passwordText.setError("Passwords Do Not Match");
+            valid = false;
+        } else {
+            passwordText.setError(null);
+        }
 
         return valid;
     }
@@ -189,81 +195,110 @@ public class SignUpActivity extends Firebase implements View.OnClickListener {
         showProgressDialog();
 
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+            if (task.isSuccessful()) {
+                // Sign up success, update UI with the signed-in user's information
+                Log.i(TAG, "createUserWithEmail:success");
+
+                // Add user's Details to Firestore DB
+                // Collection - drivers
+                String email = email();
+                String firstName = firstName();
+                final String lastName = lastName();
+                String strId = idNumber();
+                String phoneNumber = phoneNumber();
+
+                int idNumber = Integer.parseInt(strId);
+                CollectionReference drivers = db.collection("drivers");
+
+                Map<String, Object> userDetails = new HashMap<>();
+                userDetails.put("email", email);
+                userDetails.put("first_name", firstName);
+                userDetails.put("last_name", lastName);
+                userDetails.put("id_number", idNumber);
+                userDetails.put("phone_number", phoneNumber);
+
+                drivers.document(email).set(userDetails)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign up success, update UI with the signed-in user's information
-                            Log.i(TAG, "createUserWithEmail:success");
+                    public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isComplete() || task.isSuccessful()) {
+                        Log.i(TAG, "Driver Data Created");
+                        STATUS = "Success";
 
-                            // Add user's Details to Firestore DB
-                            // Collection - passengers
-                            String email = email();
-                            String firstName = firstName();
-                            final String lastName = lastName();
-                            String strId = idNumber();
-                            String phoneNumber = phoneNumber();
+                        SharedPreferences sharedPreferences;
 
-                            int idNumber = Integer.parseInt(strId);
-                            CollectionReference passengers = db.collection("passengers");
+                        String email = emailText.getText().toString();
+                        String phone = phoneText.getText().toString();
+                        String idNum = idText.getText().toString();
+                        String names = firstText.getText().toString() + " " + lastText.getText().toString();
 
-                            Map<String, Object> userDetails = new HashMap<>();
-                            userDetails.put("email", email);
-                            userDetails.put("first_name", firstName);
-                            userDetails.put("last_name", lastName);
-                            userDetails.put("id_number", idNumber);
-                            userDetails.put("phone_number", phoneNumber);
+                        sharedPreferences = getApplicationContext().getSharedPreferences(DRIVER_DETAILS, 0);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                            passengers.document(email).set(userDetails)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isComplete() || task.isSuccessful()) {
-                                                Log.i(TAG, "Passenger Data Created");
-                                                STATUS = "Success";
+                        editor.putString("EMAIL", email);
+                        editor.putString("PHONE", phone);
+                        editor.putString("ID_NUM", idNum);
+                        editor.putString("NAMES", names);
+                        editor.apply();
 
-                                                SharedPreferences sharedPreferences;
+                        EMAIL = email;
+                        NAMES = names;
+                        PHONE = phone;
 
-                                                String email = emailText.getText().toString();
-                                                String phone = phoneText.getText().toString();
-                                                String idNum = idText.getText().toString();
-                                                String names = firstText.getText().toString() + " " + lastText.getText().toString();
+                        // Firebase Messaging Token Registration
+                        FirebaseInstanceId.getInstance().getInstanceId()
+                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                if (!task.isSuccessful()) {
+                                    Log.e(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXX getInstanceId failed", task.getException());
+                                    return;
+                                }
 
-                                                sharedPreferences = getApplicationContext().getSharedPreferences(PASSENGER_DETAILS, 0);
-                                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                // Get new Instance ID token
+                                String token = task.getResult().getToken();
 
-                                                editor.putString("EMAIL", email);
-                                                editor.putString("PHONE", phone);
-                                                editor.putString("ID_NUM", idNum);
-                                                editor.putString("NAMES", names);
-                                                editor.apply();
+                                // Log and toast
+                                Log.d(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXX " +  token);
 
-                                                FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                                                updateUI(firebaseUser);
-                                            } else {
-                                                Log.i(TAG, "Something went wrong: " + task.getException());
-                                                STATUS = "Failed";
+                                MessagingServices messagingService =  new MessagingServices();
+                                Context context = getApplicationContext();
+                                messagingService.onNewToken(token, context);
 
-                                                updateUI(null);
-                                            }
-                                        }
-                                    });
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.i(TAG, "createUserWithEmail:failure", task.getException());
+                                Intent intent = new Intent(SignUpActivity.this, DriverHome.class);
+                                startActivity(intent);
 
-                            regFailed.setVisibility(View.VISIBLE);
-                            regFailed.setText(task.getException().getMessage());
-                            updateUI(null);
-                        }
+                                hideProgressDialog();
+                                finish();
+                            }
+                        });
+                    } else {
+                        Log.i(TAG, "Something went wrong: " + task.getException());
+                        STATUS = "Failed";
 
-                        if (!task.isSuccessful()) {
-                            regFailed.setText(task.getException().toString());
-                        }
-
-                        hideProgressDialog();
+                        updateUI(null);
+                    }
                     }
                 });
+            } else {
+                // If sign in fails, display a message to the user.
+                Log.i(TAG, "createUserWithEmail:failure", task.getException());
+
+                regFailed.setVisibility(View.VISIBLE);
+                regFailed.setText(task.getException().getMessage());
+                updateUI(null);
+            }
+
+            if (!task.isSuccessful()) {
+                regFailed.setText(task.getException().toString());
+            }
+
+            hideProgressDialog();
+            }
+        });
     }
 
     private void updateUI(FirebaseUser user) {

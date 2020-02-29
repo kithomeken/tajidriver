@@ -1,18 +1,13 @@
-package com.tajidriver;
+package com.tajidriver.driver;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -34,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,33 +37,28 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.tajidriver.configuration.TajiCabs;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TravelMode;
+import com.tajidriver.R;
+import com.tajidriver.directions.TajiDirections;
+import com.tajidriver.service.RequestServices;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -78,24 +69,35 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.List;
 
+import static com.tajidriver.configuration.TajiCabs.ACTIVITY_STATE;
 import static com.tajidriver.configuration.TajiCabs.DEFAULT_ZOOM;
+import static com.tajidriver.configuration.TajiCabs.DEST_LTNG;
+import static com.tajidriver.configuration.TajiCabs.DEST_NAME;
+import static com.tajidriver.configuration.TajiCabs.DISTANCE;
 import static com.tajidriver.configuration.TajiCabs.GOOGLE_API;
+import static com.tajidriver.configuration.TajiCabs.ORIG_LTNG;
+import static com.tajidriver.configuration.TajiCabs.ORIG_NAME;
 import static com.tajidriver.configuration.TajiCabs.REQUEST_LOCATION;
+import static com.tajidriver.configuration.TajiCabs.RQ_COST;
+import static com.tajidriver.configuration.TajiCabs.RQ_DEST;
+import static com.tajidriver.configuration.TajiCabs.RQ_NAME;
+import static com.tajidriver.configuration.TajiCabs.RQ_ORIG;
+import static com.tajidriver.configuration.TajiCabs.RQ_PHONE;
 
+@SuppressLint("MissingPermission")
 public class DriverHome extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         OnMapReadyCallback {
 
     // TAG
     private static final String TAG = DriverHome.class.getName();
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     // Dependency classes
+    TajiDirections tajiDirections = new TajiDirections();
+
 
     protected static final int overview = 0;
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -113,10 +115,13 @@ public class DriverHome extends AppCompatActivity implements
     private Location mLastKnownLocation;
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-    private LinearLayout blockRequest, blockPlaces;
 
     private GoogleApiClient googleApiClient;
-//    final static int REQUEST_LOCATION = 199;
+
+    private LinearLayout noRequestBlock, requestBlock, tripBlock;
+    private FloatingActionButton geoLocation;
+    private TextView fromDisp, toDisp, distanceDisp, costDisp, requestName, requestPhone, tripCost;
+    private Button acceptRequest, declineRequest;
 
     @Override
     public void onStart() {
@@ -130,28 +135,52 @@ public class DriverHome extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_home);
+
         mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
 
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-//            mCameraPosition = savedInstanceState.getParcelable(KEY_LOCATION);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create channel to show notifications.
-            String channelId  = getString(R.string.default_notification_channel_id);
-            String channelName = getString(R.string.default_notification_channel_name);
-            NotificationManager notificationManager =
-                    getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(new NotificationChannel(channelId,
-                    channelName, NotificationManager.IMPORTANCE_LOW));
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), GOOGLE_API);
         }
 
-        if (getIntent().getExtras() != null) {
-            for (String key : getIntent().getExtras().keySet()) {
-                Object value = getIntent().getExtras().get(key);
-                Log.d(TAG, "Key: " + key + " Value: " + value);
+        noRequestBlock = findViewById(R.id.noRequestBlock);
+        requestBlock = findViewById(R.id.requestBlock);
+        tripBlock = findViewById(R.id.tripBlock);
+
+        fromDisp = findViewById(R.id.fromDisp);
+        toDisp = findViewById(R.id.toDisp);
+        distanceDisp = findViewById(R.id.distanceCovered);
+        costDisp = findViewById(R.id.costDisp);
+        tripCost = findViewById(R.id.tripCost);
+        requestName = findViewById(R.id.requestName);
+        requestPhone = findViewById(R.id.requestPhone);
+
+        acceptRequest = findViewById(R.id.acceptRequest);
+        declineRequest = findViewById(R.id.declineRequest);
+
+        acceptRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                acceptRideNotification();
+                drawDirections();
             }
+        });
+
+        if (RQ_NAME != null) {
+            noRequestBlock.setVisibility(View.GONE);
+            requestBlock.setVisibility(View.VISIBLE);
+            tripBlock.setVisibility(View.GONE);
+
+            // Load Ride Request Information (RRInformation)
+            RRInformation();
+        } else {
+            noRequestBlock.setVisibility(View.VISIBLE);
+            requestBlock.setVisibility(View.GONE);
+            tripBlock.setVisibility(View.GONE);
         }
 
         mLocationRequest = new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
@@ -166,90 +195,82 @@ public class DriverHome extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-        FloatingActionButton geoLocation = findViewById(R.id.geo_location);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        // Set display name, photo url and email address of signed in user
+        View navHeaderView = navigationView.getHeaderView(0);
+        TextView accountName = (TextView) navHeaderView.findViewById(R.id.accountName);
+        TextView accountEmail = (TextView) navHeaderView.findViewById(R.id.accountEmail);
+
+        assert user != null;
+        accountName.setText(user.getDisplayName());
+        accountEmail.setText(user.getEmail());
+
+        geoLocation = findViewById(R.id.geo_location);
         geoLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseMessaging.getInstance().subscribeToTopic("weather")
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            String msg = getString(R.string.msg_subscribed);
-                            if (!task.isSuccessful()) {
-                                msg = getString(R.string.msg_subscribe_failed);
-
-                                Toast.makeText(DriverHome.this, msg, Toast.LENGTH_SHORT).show();
-                            }
-
-                            Log.d(TAG, msg);
-                            Toast.makeText(DriverHome.this, msg, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-            }
-        });
-
-        FloatingActionButton fab = findViewById(R.id.new_button);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseInstanceId.getInstance().getInstanceId()
-                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                                if (!task.isSuccessful()) {
-                                    Log.w(TAG, "getInstanceId failed", task.getException());
-                                    return;
-                                }
-
-                                // Get new Instance ID token
-                                String token = task.getResult().getToken();
-
-                                // Log and toast
-                                String msg = getString(R.string.msg_token_fmt, token);
-                                Log.d(TAG, msg);
-                                Toast.makeText(DriverHome.this, msg, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
+                getDeviceLocation();
             }
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.driver_home, menu);
-        return true;
-    }
+    private void drawDirections() {
+        if (DEST_LTNG != null && ORIG_LTNG != null) {
+            mMap.clear();
+            googleMapsUISetting(mMap);
 
-    private void checkFirebaseSession(FirebaseUser user) {
-        if (user != null) {
-            // Do nothing
+            DirectionsResult directionsResult = tajiDirections
+                    .getDirectionsDetails(ORIG_LTNG, DEST_LTNG, TravelMode.DRIVING);
 
-        } else{
-            //Return to SignInActivity
-            Intent intent = new Intent(DriverHome.this, SignInActivity.class);
-            startActivity(intent);
-            finish();
+            if (directionsResult != null) {
+                tajiDirections.addPolyline(directionsResult, mMap);
+                tajiDirections.positionCamera(directionsResult.routes[overview], mMap);
+                tajiDirections.addMarkersToMap(directionsResult, mMap);
+            }
+
+            DISTANCE = tajiDirections.distanceInMeters(directionsResult);
+
+            fromDisp.setText("From: " + ORIG_NAME);
+            toDisp.setText("To: " + DEST_NAME);
+            distanceDisp.setText(DISTANCE);
+
+            noRequestBlock.setVisibility(View.GONE);
+            requestBlock.setVisibility(View.GONE);
+            tripBlock.setVisibility(View.VISIBLE);
+
+            changeMarginBottom();
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        return false;
+    private void changeMarginBottom() {
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams)
+                geoLocation.getLayoutParams();
+        layoutParams.setMargins(0, 0, 0,300 );
+        geoLocation.setLayoutParams(layoutParams);
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+    private void googleMapsUISetting(GoogleMap mMap) {
+        mMap.setBuildingsEnabled(true);
+        mMap.setIndoorEnabled(true);
+        mMap.setTrafficEnabled(false);
+
+        UiSettings mUiSettings = mMap.getUiSettings();
+
+        mUiSettings.setZoomControlsEnabled(true);
+        mUiSettings.setCompassEnabled(true);
+        mUiSettings.setMyLocationButtonEnabled(false);
+        mUiSettings.setScrollGesturesEnabled(true);
+
+        mUiSettings.setZoomGesturesEnabled(true);
+        mUiSettings.setTiltGesturesEnabled(true);
+        mUiSettings.setRotateGesturesEnabled(true);
     }
 
     @Override
@@ -269,9 +290,8 @@ public class DriverHome extends AppCompatActivity implements
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
-        mMap.animateCamera(CameraUpdateFactory
-                .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        // Get Current Location of Device
+        getDeviceLocation();
     }
 
     /**
@@ -363,7 +383,42 @@ public class DriverHome extends AppCompatActivity implements
                 }
             }
         }
+
         updateLocationUI();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.driver_home, menu);
+        return true;
+    }
+
+    private void checkFirebaseSession(FirebaseUser user) {
+        if (user != null) {
+            // Do nothing
+
+        } else{
+            //Return to SignInActivity
+            Intent intent = new Intent(DriverHome.this, SignInActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     /**
@@ -399,6 +454,7 @@ public class DriverHome extends AppCompatActivity implements
         builder.setAlwaysShow(true); //this is the key ingredient
 
         GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
                 .build();
 
 
@@ -433,6 +489,38 @@ public class DriverHome extends AppCompatActivity implements
             }
         });
     }
+
+    private void RRInformation() {
+        // Ride Request Information
+        requestName.setText("You have a ride request from " + RQ_NAME);
+        requestPhone.setText("Phone  No: " + RQ_PHONE);
+        costDisp.setText(RQ_COST);
+        tripCost.setText(RQ_COST);
+
+        String[] orig =  RQ_ORIG.split(",");
+        double oLat = Double.parseDouble(orig[0]);
+        double oLng = Double.parseDouble(orig[1]);
+
+        String[] dest =  RQ_DEST.split(",");
+        double dLat = Double.parseDouble(dest[0]);
+        double dLng = Double.parseDouble(dest[1]);
+
+        ORIG_LTNG = new LatLng(oLat, oLng);
+        DEST_LTNG = new LatLng(dLat, dLng);
+    }
+
+    private void acceptRideNotification() {
+        ACTIVITY_STATE = 703;
+
+        RequestServices requestServices = new RequestServices(getApplicationContext());
+        requestServices.acceptRide();
+    }
+
+
+
+
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -524,6 +612,7 @@ public class DriverHome extends AppCompatActivity implements
             });
         }
     }
+
 }
 
 

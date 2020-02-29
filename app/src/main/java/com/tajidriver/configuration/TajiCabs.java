@@ -4,33 +4,31 @@ package com.tajidriver.configuration;
 import com.google.android.gms.maps.model.LatLng;
 
 public class TajiCabs {
-    public final static String PASSENGER_DETAILS = "PASSENGER_DETAILS";
+    public final static String DRIVER_DETAILS = "DRIVER_DETAILS";
 
     public static String EMAIL;
     public static String NAMES;
     public static String IDNUM;
     public static String PHONE;
+    public static String REG_NO = "GH";
+    public static String VEHMAKE = "DX";
 
-    public final static String GOOGLE_API = "AIzaSyAxLhVQdc7JXdSXcG5L_-fgwh_WcDtAeMY";
+    public final static String GOOGLE_API = "AIzaSyAAiRrbL3TId8hGBTVwLNj1-TI43ldIDcs";
 
     public static LatLng ORIG_LTNG = null;
     public static String ORIG_NAME = null;
-
     public static LatLng DEST_LTNG = null;
     public static String DEST_NAME = null;
 
+    public static String DISTANCE = null;
+
     public static final int DEFAULT_ZOOM = 18;
     public static final int REQUEST_LOCATION = 199;
+    public static int ACTIVITY_STATE = 0;
 
-    public static final String TOPIC_GLOBAL = "global";
-
-    // broadcast receiver intent filters
-    public static final String REGISTRATION_COMPLETE = "registrationComplete";
-    public static final String PUSH_NOTIFICATION = "pushNotification";
-
-    // id to handle the notification in the notification tray
-    public static final int NOTIFICATION_ID = 100;
-    public static final int NOTIFICATION_ID_BIG_IMAGE = 101;
-
-    public static final String SHARED_PREF = "ah_firebase";
+    public static String RQ_NAME = null;
+    public static String RQ_PHONE = null;
+    public static String RQ_ORIG = null;
+    public static String RQ_DEST = null;
+    public static String RQ_COST = null;
 }
