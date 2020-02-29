@@ -1,5 +1,6 @@
 package com.tajidriver.service;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,11 +17,16 @@ import androidx.work.WorkManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.tajidriver.DriverHome;
-import com.tajidriver.R;
 
-public class MessagingService extends FirebaseMessagingService {
-    private static final String TAG = "TajiMessagingServices";
+import com.tajidriver.R;
+import com.tajidriver.configuration.TajiCabs;
+import com.tajidriver.driver.DriverHome;
+
+import java.util.Map;
+
+@SuppressLint("Registered")
+public class MessagingServices extends FirebaseMessagingService implements IRequestListener  {
+    private static final String TAG = MessagingServices.class.getName();
 
     /**
      * Called when message is received.
@@ -52,7 +58,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            Log.e(TAG, "===================Message data payload: " + remoteMessage.getData());
 
             if (/* Check if data needs to be processed by long running job */ true) {
                 // For long-running tasks (10 seconds or more) use WorkManager.
@@ -60,13 +66,30 @@ public class MessagingService extends FirebaseMessagingService {
             } else {
                 // Handle message within 10 seconds
                 handleNow();
+
             }
         }
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            Log.e(TAG, "====================Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
+
+        Map<String, String> hashMap = remoteMessage.getData();
+
+        String requestType = hashMap.get("request_type");
+
+        switch (requestType) {
+            case "701":
+                sendNotification(remoteMessage.getData());
+            break;
+
+            case "702":
+                // Ride Request
+                requestNotification(remoteMessage.getData());
+            break;
+        }
+
     }
 
     /**
@@ -75,13 +98,13 @@ public class MessagingService extends FirebaseMessagingService {
      * is initially generated so this is where you would retrieve the token.
      */
     @Override
-    public void onNewToken(String token) {
+    public void onNewToken(String token, Context context) {
         Log.d(TAG, "Refreshed token: " + token);
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // Instance ID token to your app server.
-        sendRegistrationToServer(token);
+        sendRegistrationToServer(token, context);
     }
 
     /**
@@ -108,32 +131,54 @@ public class MessagingService extends FirebaseMessagingService {
      * Modify this method to associate the user's FCM InstanceID token with any server-side account
      * maintained by your application.
      *
-     * @param token The new token.
+     * @param firebaseToken The new token.
      */
-    private void sendRegistrationToServer(String token) {
+    private void sendRegistrationToServer(String firebaseToken, Context context) {
         // TODO: Implement this method to send token to your app server.
+        // Add custom implementation, as needed.
+
+        RegisterToken registerToken = new RegisterToken(context, this);
+        registerToken.firebaseTokenRegistration(firebaseToken);
+    }
+
+    @Override
+    public void onComplete() {
+        Log.d(TAG, "=====================================Token registered successfully in the DB");
+
+    }
+
+    @Override
+    public void onError(String message) {
+        Log.d(TAG, "======================================Error trying to register the token in the DB: " + message);
     }
 
     /**
      * Create and show a simple notification containing the received FCM message.
      *
-     * @param messageBody FCM message body received.
+     * @param hashMap FCM message body received.
      */
-    private void sendNotification(String messageBody) {
+    private void sendNotification(Map<String, String> hashMap) {
         Intent intent = new Intent(this, DriverHome.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
+
+        // Message Breakdown
+        String title = hashMap.get("title");
+        String content = hashMap.get("content");
+        String action = hashMap.get("action");
 
         String channelId = getString(R.string.default_notification_channel_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.ic_taji_cabs_foreground)
-                        .setContentTitle(getString(R.string.fcm_message))
-                        .setContentText(messageBody)
+                        .setSmallIcon(R.drawable.taji_icon)
+                        .setContentTitle(title)
+                        .setContentText(content)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
+                        .setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
                         .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
@@ -148,5 +193,55 @@ public class MessagingService extends FirebaseMessagingService {
         }
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    /**
+     * Create and show a simple notification containing the received FCM message.
+     *
+     * @param hashMap FCM message body received.
+     */
+    private void requestNotification(Map<String, String> hashMap) {
+        Intent intent = new Intent(this, DriverHome.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        // Message Breakdown
+        String title = hashMap.get("title");
+        String content = hashMap.get("content");
+        TajiCabs.RQ_NAME = hashMap.get("name");
+        TajiCabs.RQ_DEST = hashMap.get("destination");
+        TajiCabs.RQ_ORIG = hashMap.get("origin");
+        TajiCabs.RQ_PHONE = hashMap.get("phone_number");
+        TajiCabs.RQ_COST = hashMap.get("cost");
+
+        String channelId = getString(R.string.default_notification_channel_id);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this, channelId)
+                        .setSmallIcon(R.drawable.taji_icon)
+                        .setContentTitle(title)
+                        .setContentText(content)
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
+                        .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+
+        // Build Request UI
+
     }
 }

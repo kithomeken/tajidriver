@@ -1,24 +1,22 @@
-package com.tajidriver;
+package com.tajidriver.driver;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+
+import com.tajidriver.R;
 import com.tajidriver.configuration.Firebase;
-import com.tajidriver.configuration.TajiCabs;
+import com.tajidriver.service.MessagingServices;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.text.TextUtils;
@@ -26,7 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+import static com.tajidriver.configuration.TajiCabs.EMAIL;
 
 public class SignInActivity extends Firebase implements View.OnClickListener {
     private static final String TAG = "Sign In Activity";
@@ -35,7 +33,6 @@ public class SignInActivity extends Firebase implements View.OnClickListener {
     private TextView authFailed;
     private EditText emailText;
     private EditText passwordText;
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
     public void onStart() {
@@ -60,44 +57,6 @@ public class SignInActivity extends Firebase implements View.OnClickListener {
 
         findViewById(R.id.accountSignIn).setOnClickListener(this);
         findViewById(R.id.accountSignUp).setOnClickListener(this);
-
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                // checking for type intent filter
-                if (intent.getAction().equals(TajiCabs.REGISTRATION_COMPLETE)) {
-                    // gcm successfully registered
-                    // now subscribe to `global` topic to receive app wide notifications
-                    FirebaseMessaging.getInstance().subscribeToTopic(TajiCabs.TOPIC_GLOBAL);
-
-                    displayFirebaseRegId();
-
-                } else if (intent.getAction().equals(TajiCabs.PUSH_NOTIFICATION)) {
-                    // new push notification is received
-
-                    String message = intent.getStringExtra("message");
-
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-
-//                    txtMessage.setText(message);
-                }
-            }
-        };
-
-        displayFirebaseRegId();
-    }
-
-    private void displayFirebaseRegId() {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences(TajiCabs.SHARED_PREF, 0);
-        String regId = pref.getString("regId", null);
-
-        Log.e(TAG, "Firebase reg id: " + regId);
-
-//        if (!TextUtils.isEmpty(regId))
-//            txtRegId.setText("Firebase Reg Id: " + regId);
-//        else
-//            txtRegId.setText("Firebase Reg Id is not received yet!");
     }
 
     @Override
@@ -142,7 +101,7 @@ public class SignInActivity extends Firebase implements View.OnClickListener {
         return valid;
     }
 
-    private void signIn(String email, String password) {
+    private void signIn(final String email, String password) {
         if (!validateForm()) {
             return;
         }
@@ -157,14 +116,38 @@ public class SignInActivity extends Firebase implements View.OnClickListener {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "Firebase Signing In: success");
 
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            // Firebase Messaging Token Registration
+                            FirebaseInstanceId.getInstance().getInstanceId()
+                                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                    if (!task.isSuccessful()) {
+                                        Log.e(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXX getInstanceId failed", task.getException());
+                                        return;
+                                    }
+
+                                    // Get new Instance ID token
+                                    String token = task.getResult().getToken();
+                                    EMAIL = email();
+
+                                    // Log and toast
+                                    Log.d(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXX " +  token);
+
+                                    MessagingServices messagingService =  new MessagingServices();
+                                    Context context = getApplicationContext();
+                                    messagingService.onNewToken(token, context);
+
+                                    Intent intent = new Intent(SignInActivity.this, DriverHome.class);
+                                    startActivity(intent);
+
+                                    hideProgressDialog();
+                                    finish();
+                                    }
+                                });
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "Firebase Signing In: Failed", task.getException());
 
-//                    Toast.makeText(SignInActivity.this, "Taji Account Authentication failed.",
-//                            Toast.LENGTH_SHORT).show();
                             authFailed.setVisibility(View.VISIBLE);
 
                             updateUI(null);
@@ -188,5 +171,9 @@ public class SignInActivity extends Firebase implements View.OnClickListener {
 
             hideProgressDialog();
         }
+    }
+
+    private String email() {
+        return emailText.getText().toString();
     }
 }

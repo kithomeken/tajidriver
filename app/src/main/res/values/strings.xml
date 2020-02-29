@@ -71,5 +71,14 @@
     <!-- [END fcm_default_icon_string] -->
     <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
     <string name="fcm_message">FCM Message</string>
+    <string name="nothing">You No Have Activity At The Moment</string>
+    <string name="request_text_notification">You have a ride request...</string>
+    <string name="distance_text">Distance To Cover</string>
+    <string name="decline_request">Decline Request</string>
+    <string name="accept_request">Accept Request</string>
+    <string name="placeholder_from">From: Githurai Kimbo</string>
+    <string name="trip_progress">Trip Progress</string>
+    <string name="end_trip">End Trip</string>
+    <string name="start_trip">Start Trip</string>
 
 </resources>

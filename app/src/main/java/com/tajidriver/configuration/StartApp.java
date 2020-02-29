@@ -5,20 +5,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-//import com.tajidriver.d.PassengerHome;
-import com.tajidriver.DriverHome;
-import com.tajidriver.SignInActivity;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
+import com.tajidriver.driver.DriverHome;
+import com.tajidriver.R;
+import com.tajidriver.driver.SignInActivity;
+import com.tajidriver.service.MessagingServices;
+
+import static com.tajidriver.configuration.TajiCabs.DRIVER_DETAILS;
 import static com.tajidriver.configuration.TajiCabs.EMAIL;
 import static com.tajidriver.configuration.TajiCabs.IDNUM;
 import static com.tajidriver.configuration.TajiCabs.NAMES;
-import static com.tajidriver.configuration.TajiCabs.PASSENGER_DETAILS;
 import static com.tajidriver.configuration.TajiCabs.PHONE;
 
 public class StartApp extends AppCompatActivity {
@@ -33,7 +41,7 @@ public class StartApp extends AppCompatActivity {
 
         if (firebaseUser != null) {
             // Get User Details
-            sharedPreferences = getSharedPreferences(PASSENGER_DETAILS, Context.MODE_PRIVATE);
+            sharedPreferences = getSharedPreferences(DRIVER_DETAILS, Context.MODE_PRIVATE);
 
             if (sharedPreferences.contains("EMAIL") && sharedPreferences.contains("NAMES")
                     && sharedPreferences.contains("PHONE")) {
