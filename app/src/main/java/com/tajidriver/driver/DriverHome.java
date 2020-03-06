@@ -39,6 +39,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,6 +59,7 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
 import com.tajidriver.R;
 import com.tajidriver.directions.TajiDirections;
+import com.tajidriver.geolocation.LocationSharing;
 import com.tajidriver.service.RequestServices;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -83,8 +85,11 @@ import static com.tajidriver.configuration.TajiCabs.ORIG_NAME;
 import static com.tajidriver.configuration.TajiCabs.REQUEST_LOCATION;
 import static com.tajidriver.configuration.TajiCabs.RQ_COST;
 import static com.tajidriver.configuration.TajiCabs.RQ_DEST;
+import static com.tajidriver.configuration.TajiCabs.RQ_DEST_NAME;
+import static com.tajidriver.configuration.TajiCabs.RQ_DISTANCE;
 import static com.tajidriver.configuration.TajiCabs.RQ_NAME;
 import static com.tajidriver.configuration.TajiCabs.RQ_ORIG;
+import static com.tajidriver.configuration.TajiCabs.RQ_ORIG_NAME;
 import static com.tajidriver.configuration.TajiCabs.RQ_PHONE;
 
 @SuppressLint("MissingPermission")
@@ -170,6 +175,15 @@ public class DriverHome extends AppCompatActivity implements
             }
         });
 
+        declineRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noRequestBlock.setVisibility(View.VISIBLE);
+                requestBlock.setVisibility(View.GONE);
+                tripBlock.setVisibility(View.GONE);
+            }
+        });
+
         if (RQ_NAME != null) {
             noRequestBlock.setVisibility(View.GONE);
             requestBlock.setVisibility(View.VISIBLE);
@@ -237,9 +251,6 @@ public class DriverHome extends AppCompatActivity implements
 
             DISTANCE = tajiDirections.distanceInMeters(directionsResult);
 
-            fromDisp.setText("From: " + ORIG_NAME);
-            toDisp.setText("To: " + DEST_NAME);
-            distanceDisp.setText(DISTANCE);
 
             noRequestBlock.setVisibility(View.GONE);
             requestBlock.setVisibility(View.GONE);
@@ -277,12 +288,12 @@ public class DriverHome extends AppCompatActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        boolean success = googleMap.setMapStyle(new MapStyleOptions(getResources()
-                .getString(R.string.google_maps_theme)));
-
-        if (!success) {
-            Log.e(TAG, "==========================Style parsing failed.");
-        }
+//        boolean success = googleMap.setMapStyle(new MapStyleOptions(getResources()
+//                .getString(R.string.google_maps_theme)));
+//
+//        if (!success) {
+//            Log.e(TAG, "==========================Style parsing failed.");
+//        }
 
         // Prompt the user for permission.
         getLocationPermission();
@@ -323,10 +334,30 @@ public class DriverHome extends AppCompatActivity implements
                             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(),
                                     mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
-                            Log.e(TAG, "====================================" + mLastKnownLocation);
+                            Log.e(TAG, "====================================" + mLastKnownLocation.getLatitude());
+                            Log.e(TAG, "====================================" + mLastKnownLocation.getLongitude());
+
+                            final String locationLat = "" + mLastKnownLocation.getLatitude();
+                            final String locationLng = "" + mLastKnownLocation.getLongitude();
 
                             mLocationRequest = new LocationRequest();
                             mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+                            final Handler ha=new Handler();
+                            ha.postDelayed(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    //call function
+
+                                    ha.postDelayed(this, 10000);
+
+                                    // Location Sharing
+                                    // Share Location of Driver
+                                    LocationSharing locationSharing = new LocationSharing(getApplicationContext(), locationLat, locationLng);
+                                    locationSharing.captureDeviceLocation();
+                                }
+                            }, 10000);
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -336,7 +367,6 @@ public class DriverHome extends AppCompatActivity implements
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
                             enableLoc();
-
                         }
                     }
                 });
@@ -446,7 +476,7 @@ public class DriverHome extends AppCompatActivity implements
 
     public void settingsRequest() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(30 * 1000);
         locationRequest.setFastestInterval(5 * 1000);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -496,6 +526,10 @@ public class DriverHome extends AppCompatActivity implements
         requestPhone.setText("Phone  No: " + RQ_PHONE);
         costDisp.setText(RQ_COST);
         tripCost.setText(RQ_COST);
+
+        fromDisp.setText("From: " + RQ_ORIG_NAME);
+        toDisp.setText("To: " + RQ_DEST_NAME);
+        distanceDisp.setText(RQ_DISTANCE);
 
         String[] orig =  RQ_ORIG.split(",");
         double oLat = Double.parseDouble(orig[0]);
