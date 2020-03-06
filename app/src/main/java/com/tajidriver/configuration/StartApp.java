@@ -23,8 +23,11 @@ import com.tajidriver.R;
 import com.tajidriver.driver.SignInActivity;
 import com.tajidriver.service.MessagingServices;
 
+import java.util.Objects;
+
 import static com.tajidriver.configuration.TajiCabs.DRIVER_DETAILS;
 import static com.tajidriver.configuration.TajiCabs.EMAIL;
+import static com.tajidriver.configuration.TajiCabs.FIREBASE_TOKEN;
 import static com.tajidriver.configuration.TajiCabs.IDNUM;
 import static com.tajidriver.configuration.TajiCabs.NAMES;
 import static com.tajidriver.configuration.TajiCabs.PHONE;
@@ -53,10 +56,24 @@ public class StartApp extends AppCompatActivity {
                 IDNUM = sharedPreferences.getString("ID_NUM", "");
             }
 
-            // Go To Home
-            Intent intent = new Intent(StartApp.this, DriverHome.class);
-            startActivity(intent);
-            finish();
+            FirebaseInstanceId.getInstance().getInstanceId()
+            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                @Override
+                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (!task.isSuccessful()) {
+                    Log.e(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXX getInstanceId failed", task.getException());
+                    return;
+                }
+
+                // Get new Instance ID token
+                FIREBASE_TOKEN = Objects.requireNonNull(task.getResult()).getToken();
+
+                // Go To Home
+                Intent intent = new Intent(StartApp.this, DriverHome.class);
+                startActivity(intent);
+                finish();
+                }
+            });
         } else{
             // Go To Sign In
             Intent intent = new Intent(StartApp.this, SignInActivity.class);

@@ -31,4 +31,10 @@ public class TajiCabs {
     public static String RQ_ORIG = null;
     public static String RQ_DEST = null;
     public static String RQ_COST = null;
+
+    public static String RQ_ORIG_NAME = null;
+    public static String RQ_DEST_NAME = null;
+    public static String RQ_DISTANCE = null;
+
+    public static String FIREBASE_TOKEN;
 }

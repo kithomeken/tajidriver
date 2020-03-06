@@ -216,6 +216,10 @@ public class MessagingServices extends FirebaseMessagingService implements IRequ
         TajiCabs.RQ_PHONE = hashMap.get("phone_number");
         TajiCabs.RQ_COST = hashMap.get("cost");
 
+        TajiCabs.RQ_ORIG_NAME = hashMap.get("orig_name");
+        TajiCabs.RQ_DEST_NAME = hashMap.get("dest_name");
+        TajiCabs.RQ_DISTANCE = hashMap.get("distance");
+
         String channelId = getString(R.string.default_notification_channel_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
