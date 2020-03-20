@@ -8,7 +8,9 @@ import android.content.Context;
 
 public interface IRequestListener {
 
-    void onNewToken(String token, Context context);
+    void onNewToken(Context context, String token);
+
+    void onTokenUpdate(Context context, String token);
 
     void onComplete();
 

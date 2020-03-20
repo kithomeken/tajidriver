@@ -78,4 +78,11 @@ dependencies {
 
     // Draw GIF
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
+
+    // Room Database
+    def room_version = "2.2.4"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
 }

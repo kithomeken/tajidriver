@@ -29,11 +29,17 @@
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="@string/menu_share" />
+                android:title="Settings" />
+
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Contact Us" />
+
+            <item
+                android:id="@+id/sign_out"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Sign Out" />
         </menu>
     </item>
 

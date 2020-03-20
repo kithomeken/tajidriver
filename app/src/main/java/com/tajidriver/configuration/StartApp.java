@@ -1,6 +1,5 @@
 package com.tajidriver.configuration;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,9 +17,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
+import com.tajidriver.auth.SignIn;
+import com.tajidriver.database.AppDatabase;
+import com.tajidriver.database.RWServices;
 import com.tajidriver.driver.DriverHome;
 import com.tajidriver.R;
 import com.tajidriver.driver.SignInActivity;
+import com.tajidriver.global.Variables;
 import com.tajidriver.service.MessagingServices;
 
 import java.util.Objects;
@@ -44,17 +47,21 @@ public class StartApp extends AppCompatActivity {
 
         if (firebaseUser != null) {
             // Get User Details
+            AppDatabase appDatabase = AppDatabase.getDatabase(this);
+            RWServices rwServices = new RWServices(appDatabase);
+            rwServices.getUserDetails();
+
             sharedPreferences = getSharedPreferences(DRIVER_DETAILS, Context.MODE_PRIVATE);
 
             if (sharedPreferences.contains("EMAIL") && sharedPreferences.contains("NAMES")
                     && sharedPreferences.contains("PHONE")) {
 
                 //TODO: Load Preferences
-                EMAIL = sharedPreferences.getString("EMAIL", "");
-                NAMES = sharedPreferences.getString("NAMES", "");
-                PHONE = sharedPreferences.getString("PHONE", "");
-                IDNUM = sharedPreferences.getString("ID_NUM", "");
+                Variables.ACCOUNT_EMAIL = sharedPreferences.getString("EMAIL", "");
+                Variables.ACCOUNT_NAME = sharedPreferences.getString("NAMES", "");
+                Variables.ACCOUNT_PHONE = sharedPreferences.getString("PHONE", "");
             }
+
 
             FirebaseInstanceId.getInstance().getInstanceId()
             .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {

@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tripDetails"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical"
+    android:visibility="gone"
+    app:behavior_hideable="false"
+    android:padding="@dimen/dim_10"
+    app:behavior_peekHeight="300dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:backgroundTint="@android:color/white"
+        app:cardElevation="5dp"
+        app:cardCornerRadius="10dp" >
+
+        <LinearLayout
+            android:id="@+id/tripBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:ignore="MissingConstraints">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:paddingStart="@dimen/dim_10"
+                android:paddingEnd="@dimen/dim_10"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="@dimen/dim_10"
+                tools:ignore="MissingConstraints">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:paddingEnd="@dimen/dim_05"
+                    android:paddingStart="@dimen/dim_05"
+                    android:textColor="@color/dark_grey"
+                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:text="@string/trip_progress" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:paddingStart="@dimen/dim_10"
+                android:paddingEnd="@dimen/dim_10"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="@dimen/dim_10"
+                tools:ignore="MissingConstraints">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="20"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="match_parent"
+                        tools:ignore="MissingConstraints">
+
+                        <ImageView
+                            android:id="@+id/imageView2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/icon_pin_location" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="18"
+                        android:layout_height="match_parent"
+                        android:paddingStart="@dimen/dim_10"
+                        android:paddingEnd="@dimen/dim_10"
+                        tools:ignore="MissingConstraints">
+
+                        <TextView
+                            android:id="@+id/tripTo"
+                            android:layout_centerInParent="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:paddingEnd="@dimen/dim_05"
+                            android:paddingStart="@dimen/dim_05"
+                            android:textColor="@android:color/black"
+                            android:textSize="17sp"
+                            android:text="Passenger's Destination" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:paddingStart="@dimen/dim_10"
+                android:paddingEnd="@dimen/dim_10"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="@dimen/dim_10"
+                tools:ignore="MissingConstraints">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="20"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="match_parent"
+                        tools:ignore="MissingConstraints">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/icon_account_circle" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="18"
+                        android:layout_height="match_parent"
+                        android:paddingStart="@dimen/dim_10"
+                        android:paddingEnd="@dimen/dim_10"
+                        tools:ignore="MissingConstraints">
+
+                        <TextView
+                            android:id="@+id/tripPassengerName"
+                            android:layout_centerInParent="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:paddingEnd="@dimen/dim_05"
+                            android:paddingStart="@dimen/dim_05"
+                            android:textColor="@android:color/black"
+                            android:textSize="17sp"
+                            android:text="Passenger's Name" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:paddingStart="@dimen/dim_10"
+                android:paddingEnd="@dimen/dim_10"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="@dimen/dim_10"
+                android:layout_marginBottom="@dimen/dim_20"
+                tools:ignore="MissingConstraints">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="20"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="10"
+                        android:layout_height="match_parent"
+                        tools:ignore="MissingConstraints">
+
+                        <TextView
+                            android:id="@+id/tripPassengerPhone"
+                            android:layout_centerInParent="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:paddingEnd="@dimen/dim_05"
+                            android:paddingStart="@dimen/dim_05"
+                            android:textColor="@android:color/black"
+                            android:textSize="17sp"
+                            android:text="Passenger's Phone" />
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="10"
+                        android:orientation="horizontal"
+                        android:layout_height="match_parent"
+                        tools:ignore="MissingConstraints">
+
+                        <ImageView
+                            android:layout_width="@dimen/dim_40"
+                            android:layout_height="@dimen/dim_40"
+                            android:scaleType="fitCenter"
+                            android:layout_marginEnd="@dimen/dim_25"
+                            android:src="@drawable/icon_phone_call" />
+
+                        <ImageView
+                            android:layout_width="@dimen/dim_40"
+                            android:layout_height="@dimen/dim_40"
+                            android:layout_marginEnd="@dimen/dim_25"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/icon_chat_message" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tripFrom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:paddingEnd="@dimen/dim_05"
+                    android:visibility="gone"
+                    android:paddingStart="@dimen/dim_05"
+                    android:textColor="@android:color/black"
+                    android:textSize="17sp"
+                    android:text="@string/placeholder_from" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="6"
+                android:layout_marginTop="@dimen/dim_05"
+                tools:ignore="MissingConstraints">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:paddingStart="@dimen/dim_10"
+                    android:paddingEnd="@dimen/dim_10"
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="@dimen/dim_10"
+                    android:layout_marginBottom="@dimen/dim_10"
+                    tools:ignore="MissingConstraints">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/dim_10"
+                        android:paddingEnd="@dimen/dim_10"
+                        android:orientation="vertical"
+                        tools:ignore="MissingConstraints">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textStyle="normal"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:text="@string/distance_text" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/dim_10"
+                        android:orientation="horizontal"
+                        tools:ignore="MissingConstraints">
+
+                        <TextView
+                            android:id="@+id/tripDistance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:paddingEnd="@dimen/dim_05"
+                            android:paddingStart="@dimen/dim_05"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="@dimen/dim_40"
+                            android:text="14.5" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:paddingEnd="@dimen/dim_05"
+                            android:paddingStart="@dimen/dim_05"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="@dimen/dim_20"
+                            android:text="Km" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:paddingStart="@dimen/dim_10"
+                    android:paddingEnd="@dimen/dim_10"
+                    android:orientation="vertical"
+                    android:layout_marginTop="@dimen/dim_10"
+                    android:layout_marginBottom="@dimen/dim_10"
+                    tools:ignore="MissingConstraints">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/dim_10"
+                        android:paddingEnd="@dimen/dim_10"
+                        android:orientation="vertical"
+                        tools:ignore="MissingConstraints">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textStyle="normal"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:text="Trip Cost" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        tools:ignore="MissingConstraints">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:paddingEnd="@dimen/dim_05"
+                            android:paddingStart="@dimen/dim_05"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="@dimen/dim_20"
+                            android:text="KSh" />
+
+                        <TextView
+                            android:id="@+id/tripCost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:paddingEnd="@dimen/dim_05"
+                            android:paddingStart="@dimen/dim_05"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="@dimen/dim_40"
+                            android:text="0000" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:ignore="MissingConstraints">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    tools:ignore="MissingConstraints">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/startTrip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible"
+                        android:background="@color/colorPrimaryDark"
+                        android:textColor="@android:color/white"
+                        android:text="@string/start_trip"
+                        android:layout_gravity="center"/>
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/endTrip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/error"
+                        android:visibility="gone"
+                        android:textColor="@android:color/white"
+                        android:text="@string/end_trip"
+                        android:layout_gravity="center"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

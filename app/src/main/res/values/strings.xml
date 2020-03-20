@@ -1,5 +1,23 @@
 <resources>
     <string name="app_name">Taji Driver</string>
+    <string name="welcome_taji">Welcome to Taji Driver</string>
+    <string name="hello">Hello</string>
+    <string name="sign_in_text">Sign in with your Taji Driver account</string>
+    <string name="email_placeholder">E-mail</string>
+    <string name="email_hint">E-mail Address</string>
+    <string name="password_placeholder">Password</string>
+    <string name="password_hint">********</string>
+    <string name="accountSignUp">Create a New Taji Driver Account</string>
+    <string name="sign_up_text">Sign up to get your Taji Driver account</string>
+    <string name="forgotPassword">Forgot Password?</string>
+    <string name="fname_placeholder">First Name</string>
+    <string name="lname_placeholder">Last Name</string>
+    <string name="phone_number_placeholder">Phone Number</string>
+    <string name="confirm_password_placeholder">Confirm Password</string>
+    <string name="sign_up">Create</string>
+    <string name="create_account">Create Account</string>
+
+
     <string name="title_activity_home">HomeActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -11,23 +29,18 @@
     <string name="in_use">This e-mail address is already in use</string>
 
     // Sign In Activity
-    <string name="sign_in_text">Sign in with your Taji Cabs account</string>
-    <string name="welcome_taji">Welcome to Taji Cabs</string>
     <string name="email">E-mail Address</string>
     <string name="password">Password</string>
     <string name="sign_in">Sign In</string>
-    <string name="accountSignUp">Don\'t have an account? <!--Sign Up now--></string>
     <string name="about_taji">About Taji Cabs</string>
     <string name="auth_failed">Account Authentication Failed.</string>
 
     // Sign Up Activity
     <string name="taji_registration">Create Taji Cabs Account</string>
-    <string name="sign_up_text">Sign up to get your Taji Cabs account</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="accountSignIn">Back to Sign In</string>
     <string name="id_number">ID Number</string>
-    <string name="sign_up">Create Account</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="reg_failed">Account created failed. Try again later</string>
     <string name="err_500">Something went wrong. Try again later</string>
@@ -44,7 +57,6 @@
     <string name="default_info_title">Default Location</string>
     <string name="default_info_snippet">No places found. Location services don\'t have permissions.</string>
     <string name="pick_place">Choose a place</string>
-    <string name="hello">Hello</string>
     <string name="follow">Follow</string>
     <string name="title_activity_passenger_home">Passenger Home</string>
     <string name="pick_up">Enter Pick Up Point</string>
@@ -71,14 +83,21 @@
     <!-- [END fcm_default_icon_string] -->
     <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
     <string name="fcm_message">FCM Message</string>
-    <string name="nothing">You No Have Activity At The Moment</string>
-    <string name="request_text_notification">You have a ride request...</string>
-    <string name="distance_text">Distance To Cover</string>
-    <string name="decline_request">Decline Request</string>
-    <string name="accept_request">Accept Request</string>
+    <string name="nothing">You Have No Active Request At The Moment</string>
+    <string name="request_text_notification">Ride Request</string>
+    <string name="distance_text">Distance</string>
+    <string name="decline_request">Decline</string>
+    <string name="accept_request">Accept</string>
     <string name="placeholder_from">From: Githurai Kimbo</string>
-    <string name="trip_progress">Trip Progress</string>
+    <string name="trip_progress">Trip Details</string>
     <string name="end_trip">End Trip</string>
     <string name="start_trip">Start Trip</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="vehicle_make_placeholder">Vehicle Make</string>
+    <string name="vehicle_reg_placeholder">Vehicle License</string>
+    <string name="end_trip_pop_up_text">Your trip request is completed. Here\'s the total amount owed for the trip</string>
+    <string name="ksh">KSh</string>
+    <string name="_0000">0000</string>
+
 
 </resources>
