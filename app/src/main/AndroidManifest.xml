@@ -17,6 +17,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".app.App"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".home.Home"
+            android:theme="@style/AppTheme.TransparentActionBar"/>
+        <activity
+            android:name=".auth.SignUp"
+            android:parentActivityName=".auth.SignIn"
+            android:theme="@style/AppTheme.TransparentActionBar"/>
+        <activity
+            android:name=".auth.SignIn"
+            android:theme="@style/AppTheme.TajiNoActionBar"/>
+
+
+
 
         <activity
             android:name=".driver.DriverHome"
@@ -24,11 +45,7 @@
         <activity
             android:name=".configuration.StartApp"
             android:theme="@style/SplashTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".driver.SignUpActivity"
@@ -55,7 +72,6 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key" />

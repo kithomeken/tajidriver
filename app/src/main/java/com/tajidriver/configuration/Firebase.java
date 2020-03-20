@@ -2,6 +2,7 @@ package com.tajidriver.configuration;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -45,5 +46,4 @@ public class Firebase extends AppCompatActivity {
         super.onStop();
         hideProgressDialog();
     }
-
 }

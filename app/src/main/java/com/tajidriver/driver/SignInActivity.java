@@ -135,7 +135,7 @@ public class SignInActivity extends Firebase implements View.OnClickListener {
 
                                     MessagingServices messagingService =  new MessagingServices();
                                     Context context = getApplicationContext();
-                                    messagingService.onNewToken(token, context);
+                                    messagingService.onNewToken(context, token);
 
                                     Intent intent = new Intent(SignInActivity.this, DriverHome.class);
                                     startActivity(intent);

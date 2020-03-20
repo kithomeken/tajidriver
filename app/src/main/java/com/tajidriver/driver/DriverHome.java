@@ -91,6 +91,7 @@ import static com.tajidriver.configuration.TajiCabs.RQ_NAME;
 import static com.tajidriver.configuration.TajiCabs.RQ_ORIG;
 import static com.tajidriver.configuration.TajiCabs.RQ_ORIG_NAME;
 import static com.tajidriver.configuration.TajiCabs.RQ_PHONE;
+import static com.tajidriver.global.Variables.ACCOUNT_NAME;
 
 @SuppressLint("MissingPermission")
 public class DriverHome extends AppCompatActivity implements
@@ -102,7 +103,6 @@ public class DriverHome extends AppCompatActivity implements
 
     // Dependency classes
     TajiDirections tajiDirections = new TajiDirections();
-
 
     protected static final int overview = 0;
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -126,7 +126,7 @@ public class DriverHome extends AppCompatActivity implements
     private LinearLayout noRequestBlock, requestBlock, tripBlock;
     private FloatingActionButton geoLocation;
     private TextView fromDisp, toDisp, distanceDisp, costDisp, requestName, requestPhone, tripCost;
-    private Button acceptRequest, declineRequest;
+    private Button acceptRequest, declineRequest, startTrip, endTrip;
 
     @Override
     public void onStart() {
@@ -223,7 +223,7 @@ public class DriverHome extends AppCompatActivity implements
         TextView accountEmail = (TextView) navHeaderView.findViewById(R.id.accountEmail);
 
         assert user != null;
-        accountName.setText(user.getDisplayName());
+        accountName.setText(ACCOUNT_NAME);
         accountEmail.setText(user.getEmail());
 
         geoLocation = findViewById(R.id.geo_location);
@@ -231,6 +231,32 @@ public class DriverHome extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 getDeviceLocation();
+            }
+        });
+
+        startTrip = findViewById(R.id.startTrip);
+        endTrip = findViewById(R.id.endTrip);
+
+        endTrip.setVisibility(View.GONE);
+        startTrip.setVisibility(View.VISIBLE);
+
+        startTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endTrip.setVisibility(View.VISIBLE);
+                startTrip.setVisibility(View.GONE);
+            }
+        });
+
+        endTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                RequestServices requestServices = new RequestServices(getApplicationContext());
+//                requestServices.endRide();
+
+                noRequestBlock.setVisibility(View.VISIBLE);
+                requestBlock.setVisibility(View.GONE);
+                tripBlock.setVisibility(View.GONE);
             }
         });
     }
@@ -438,6 +464,17 @@ public class DriverHome extends AppCompatActivity implements
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        int itemId = menuItem.getItemId();
+        Intent intent;
+
+        if (itemId == R.id.sign_out) {
+            FirebaseAuth.getInstance().signOut();
+
+            intent = new Intent(this, SignInActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         return false;
     }
 
@@ -529,6 +566,14 @@ public class DriverHome extends AppCompatActivity implements
 
         fromDisp.setText("From: " + RQ_ORIG_NAME);
         toDisp.setText("To: " + RQ_DEST_NAME);
+
+        TextView tripFrom, tripTo;
+        tripFrom = findViewById(R.id.tripFrom);
+        tripTo = findViewById(R.id.tripTo);
+
+        tripFrom.setText("From: " + RQ_ORIG_NAME);
+        tripTo.setText("To: " + RQ_DEST_NAME);
+
         distanceDisp.setText(RQ_DISTANCE);
 
         String[] orig =  RQ_ORIG.split(",");

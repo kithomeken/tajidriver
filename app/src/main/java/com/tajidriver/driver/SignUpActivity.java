@@ -17,6 +17,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.tajidriver.R;
 import com.tajidriver.configuration.Firebase;
+import com.tajidriver.global.Variables;
 import com.tajidriver.service.MessagingServices;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 
 import static com.tajidriver.configuration.TajiCabs.DRIVER_DETAILS;
 import static com.tajidriver.configuration.TajiCabs.EMAIL;
+import static com.tajidriver.configuration.TajiCabs.FIREBASE_TOKEN;
 import static com.tajidriver.configuration.TajiCabs.NAMES;
 import static com.tajidriver.configuration.TajiCabs.PHONE;
 
@@ -277,6 +279,12 @@ public class SignUpActivity extends Firebase implements View.OnClickListener {
             editor.putString("NAMES", names);
             editor.apply();
 
+            Variables.ACCOUNT_EMAIL = email;
+            Variables.ACCOUNT_PHONE = phone;
+            Variables.ACCOUNT_NAME = names;
+            Variables.VEHICLE_MAKE = "Toyota Passo";
+            Variables.VEHICLE_REGNO = "KAC 001E";
+
             EMAIL = email;
             NAMES = names;
             PHONE = phone;
@@ -286,28 +294,29 @@ public class SignUpActivity extends Firebase implements View.OnClickListener {
 
             // Firebase Messaging Token Registration
             FirebaseInstanceId.getInstance().getInstanceId()
-                    .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                            if (!task.isSuccessful()) {
-                                Log.e(TAG, "Getting Firebase InstanceId failed", task.getException());
-                                return;
-                            }
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                    if (!task.isSuccessful()) {
+                        Log.e(TAG, "Getting Firebase InstanceId failed", task.getException());
+                        return;
+                    }
 
-                            // Get new Instance ID token
-                            String token = task.getResult().getToken();
-                            Log.i(TAG, "Firebase InstanceId Token: " +  token);
+                    // Get new Instance ID token
+                    String token = task.getResult().getToken();
+                    FIREBASE_TOKEN = token;
+                    Log.i(TAG, "Firebase InstanceId Token: " +  token);
 
-                            MessagingServices messagingService =  new MessagingServices();
-                            Context context = getApplicationContext();
-                            messagingService.onNewToken(token, context);
+                    MessagingServices messagingService =  new MessagingServices();
+                    Context context = getApplicationContext();
+                    messagingService.onNewToken(context, token);
 
-                            // Finish Sign In Activity
-                            Intent intent = new Intent(SignUpActivity.this, DriverHome.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
+                    // Finish Sign In Activity
+                    Intent intent = new Intent(SignUpActivity.this, DriverHome.class);
+                    startActivity(intent);
+                    finish();
+                    }
+                });
 
             return null;
         }
