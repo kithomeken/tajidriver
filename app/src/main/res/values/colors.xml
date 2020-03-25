@@ -11,4 +11,6 @@
     <color name="lightGreen">#ABEBC6</color>
     <color name="brown">#D18B49</color>
     <color name="true_blue">#0000FF</color>
+    <color name="white">#FFF</color>
+    <color name="black">#000</color>
 </resources>

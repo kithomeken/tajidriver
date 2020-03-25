@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -32,6 +34,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import com.tajidriver.R;
+import com.tajidriver.app.TaxiSetUp;
 import com.tajidriver.configuration.TajiCabs;
 import com.tajidriver.database.AppDatabase;
 import com.tajidriver.database.RWServices;
@@ -39,24 +42,20 @@ import com.tajidriver.database.UserDetails;
 import com.tajidriver.database.UserDetailsDao;
 import com.tajidriver.global.Constants;
 import com.tajidriver.global.Variables;
-import com.tajidriver.home.Home;
- import com.tajidriver.threads.AuthThread;
+import com.tajidriver.threads.AuthThread;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.tajidriver.global.Variables.ACCOUNT_EMAIL;
-import static com.tajidriver.global.Variables.ACCOUNT_NAME;
-import static com.tajidriver.global.Variables.ACCOUNT_PHONE;
 import static com.tajidriver.global.Variables.VEHICLE_MAKE;
 import static com.tajidriver.global.Variables.VEHICLE_REGNO;
 
 public class SignUp extends AppCompatActivity {
     private static String TAG = SignUp.class.getName();
 
-    private AppDatabase appDatabase;
+    private RWServices rwServices;
     private UserDetailsDao userDetailsDao;
     private FirebaseAuth firebaseAuth;
 
@@ -76,7 +75,8 @@ public class SignUp extends AppCompatActivity {
 
         authThread = new AuthThread(SignUp.this, "Creating New User");
         firebaseAuth = FirebaseAuth.getInstance();
-        appDatabase = AppDatabase.getDatabase(this);
+        AppDatabase appDatabase = AppDatabase.getDatabase(this);
+        rwServices = new RWServices(appDatabase);
         userDetailsDao = appDatabase.userDetailsDao();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -156,14 +156,6 @@ public class SignUp extends AppCompatActivity {
 
                                 // Send Account Token to Server
                                 registerAccountToken(firebaseToken);
-
-                                // End Main Thread
-                                Variables.ACTIVITY_STATE = 1;
-                                authThread.hideProgressDialog();
-
-                                Intent intent = new Intent(SignUp.this, Home.class);
-                                startActivity(intent);
-                                finish();
                             }
                         });
                 } else {
@@ -200,7 +192,6 @@ public class SignUp extends AppCompatActivity {
         userDetailsDao.createNewUser(userDetails);
 
         // Fetch User Details
-        RWServices rwServices = new RWServices(appDatabase);
         rwServices.getUserDetails();
     }
 
@@ -214,27 +205,49 @@ public class SignUp extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.e(TAG, "ON SUCCESS " + response);
+
+                        Intent intent = new Intent(SignUp.this, TaxiSetUp.class);
+                        startActivity(intent);
+
+                        // End Main Thread
+                        Variables.ACTIVITY_STATE = 0;
+                        authThread.hideProgressDialog();
+                        finish();
                     }
                 }, new Response.ErrorListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "ON FAILURE " + error.getMessage());
+                FirebaseAuth.getInstance().signOut();
+
+                authFailed.setVisibility(View.VISIBLE);
+                accountError.setText("Error creating Taji Cabs account. Kindly check your internet connectivity");
+
+                Variables.ACTIVITY_STATE = 0;
+                // End Main Thread
+                authThread.hideProgressDialog();
             }
         }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
+                String firstName = rwServices.getFirstName();
+                String lastName = rwServices.getLastName();
+                String phoneNumber = rwServices.getPhoneNumber();
+                String emailAdd  = rwServices.getEmailAdd();
+
                 params.put("token", firebaseToken);
-                params.put("group", "Driver");
-                params.put("email", ACCOUNT_EMAIL);
-                params.put("phone_number", ACCOUNT_PHONE);
-                params.put("name", ACCOUNT_NAME);
+                params.put("first_name", firstName);
+                params.put("last_name", lastName);
+                params.put("phone_number", phoneNumber);
+                params.put("email", emailAdd);
+
                 params.put("vehicle_make", VEHICLE_MAKE);
                 params.put("reg_no", VEHICLE_REGNO);
 
                 return params;
             }
-
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<>();

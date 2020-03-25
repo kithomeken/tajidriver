@@ -98,6 +98,47 @@
     <string name="end_trip_pop_up_text">Your trip request is completed. Here\'s the total amount owed for the trip</string>
     <string name="ksh">KSh</string>
     <string name="_0000">0000</string>
+    <string name="welcome_long_text">Let us be the first to welcome you to the Taji Driver family. You\'ve taken the first step in becoming a sophisticated driver. \n\nLet\'s setup your taxi before we get you a trip request</string>
+    <string name="to_dashboard">To Dashboard</string>
+    <string name="my_profile">My Profile</string>
+    <string name="my_trips">My Trips</string>
+    <string name="settings">Settings</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="vehicle_management">Vehicle Management</string>
+    <string name="vehicle_make">Vehicle Make</string>
+    <string name="vehicle_registration">Vehicle Registration</string>
+    <string name="add_vehicle">Add Vehicle</string>
+    <string name="no_vehicles_found">No Vehicles Found</string>
+    <string name="set_up_your_taxi">Set up your Taxi</string>
+    <string name="skip_setup">Skip Taxi Setup</string>
+    <string name="add_taxi">Add Taxi</string>
+    <string name="vehicle_brand">Vehicle Brand</string>
+    <string name="vehicle_model">Model</string>
+    <string name="year_of_manuf">Year</string>
+    <string name="license_plate">License Plate</string>
+    <string name="vehicle_color">Color</string>
+    <string name="seating_capacity">Seating Capacity</string>
+    <string name="successful_setup">We\'ve set up your Taji Taxi successfully, now let\'s get you a trip request</string>
+    <string name="taxi_setup_complete">Taxi Setup Complete</string>
+    <string name="title_activity_settings">Settings</string>
 
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="taxi_management">Taxi Management</string>
+    <string name="terms_privacy_policy"><![CDATA[Terms & Privacy Policy]]></string>
 
 </resources>

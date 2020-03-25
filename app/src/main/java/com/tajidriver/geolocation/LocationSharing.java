@@ -10,6 +10,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.tajidriver.database.AppDatabase;
+import com.tajidriver.database.RWServices;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +56,15 @@ public class LocationSharing {
                 params.put("token", FIREBASE_TOKEN);
 
                 // Driver Activity State
-                params.put("activity_state", "E");
+                AppDatabase appDatabase = AppDatabase.getDatabase(context);
+                RWServices rwServices = new RWServices(appDatabase);
+                String tripId = rwServices.getActiveTrip();
+
+                if (tripId.equalsIgnoreCase("No Data Found")) {
+                    params.put("activity_state", "E");
+                } else {
+                    params.put("activity_state", "A");
+                }
 
                 Log.d(TAG, "=====================================" + params);
 
