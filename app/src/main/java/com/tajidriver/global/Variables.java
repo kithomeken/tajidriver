@@ -10,6 +10,7 @@ public class Variables {
     public static String VEHICLE_MAKE = null;
 
     public static int ACTIVITY_STATE = 0;
+    public static int TAXI_SETUP = 0;
 
     public static String PASSENGER_NAME = null;
     public static String PASSENGER_PHONE = null;

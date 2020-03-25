@@ -58,8 +58,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
+
 import com.tajidriver.R;
-import com.tajidriver.app.App;
 import com.tajidriver.auth.SignIn;
 import com.tajidriver.database.AppDatabase;
 import com.tajidriver.database.RWServices;
@@ -69,6 +69,7 @@ import com.tajidriver.directions.TajiDirections;
 import com.tajidriver.geolocation.LocationSharing;
 import com.tajidriver.global.Variables;
 import com.tajidriver.service.RequestServices;
+import com.tajidriver.settings.Settings;
 
 import java.util.Objects;
 
@@ -136,6 +137,7 @@ public class Home extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_sreen);
+        Variables.ACTIVITY_STATE = 0;
 
         // Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
@@ -146,6 +148,7 @@ public class Home extends AppCompatActivity implements
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -273,7 +276,29 @@ public class Home extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        int itemId = menuItem.getItemId();
+        Intent intent;
+
+        if (itemId == R.id.nav_settings) {
+            if (Variables.ACTIVITY_STATE == 0) {
+                Variables.ACTIVITY_STATE = 1;
+
+                intent = new Intent(this, Settings.class);
+                startActivity(intent);
+            }
+        } else if (itemId == R.id.sign_out) {
+            if (Variables.ACTIVITY_STATE == 0) {
+                Variables.ACTIVITY_STATE = 1;
+
+                FirebaseAuth.getInstance().signOut();
+
+                intent = new Intent(this, SignIn.class);
+                startActivity(intent);
+                finish();
+            }
+        }
+
         return false;
     }
 
@@ -618,24 +643,28 @@ public class Home extends AppCompatActivity implements
                             final String locationLat = "" + mLastKnownLocation.getLatitude();
                             final String locationLng = "" + mLastKnownLocation.getLongitude();
 
-                            mLocationRequest = new LocationRequest();
-                            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                            String taxiRegNo = rwServices.getTaxiRegNo();
+                            String tripDetails = rwServices.getActiveTrip();
 
-                            final Handler ha=new Handler();
-                            ha.postDelayed(new Runnable() {
+                            if (!taxiRegNo.equalsIgnoreCase("No Data Found")) {
+                                mLocationRequest = new LocationRequest();
+                                mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-                                @Override
-                                public void run() {
-                                    //call function
+                                final Handler ha=new Handler();
+                                ha.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //call function
 
-                                    ha.postDelayed(this, 10000);
+                                        ha.postDelayed(this, 10000);
 
-                                    // Location Sharing
-                                    // Share Location of Driver
-                                    LocationSharing locationSharing = new LocationSharing(getApplicationContext(), locationLat, locationLng);
-                                    locationSharing.captureDeviceLocation();
-                                }
-                            }, 10000);
+                                        // Location Sharing
+                                        // Share Location of Driver
+                                        LocationSharing locationSharing = new LocationSharing(getApplicationContext(), locationLat, locationLng);
+                                        locationSharing.captureDeviceLocation();
+                                    }
+                                }, 10000);
+                            }
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());

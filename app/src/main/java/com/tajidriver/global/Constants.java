@@ -9,6 +9,8 @@ public class Constants {
     public static final String UPDATE_FIREBASE_TOKEN = "/taji/firebase/driver/register";
     public static final String TRIP_ALERT_START = "/taji/firebase/trip/start";
 
+    public static final String TAXI_CHECK = "/taji/firebase/vehicle/check";
+    public static final String REGISTER_TAXI = "/taji/firebase/vehicle/add";
 
 
 }

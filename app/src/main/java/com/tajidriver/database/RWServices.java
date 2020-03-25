@@ -15,10 +15,12 @@ public class RWServices {
 
     private UserDetailsDao userDetailsDao;
     private TripDetailsDao tripDetailsDao;
+    private VehicleDetailsDao vehicleDetailsDao;
 
     public RWServices(AppDatabase appDatabase) {
         userDetailsDao = appDatabase.userDetailsDao();
         tripDetailsDao = appDatabase.tripDetailsDao();
+        vehicleDetailsDao = appDatabase.vehicleDetailsDao();
     }
 
     public void createUser(@NonNull String email, @NonNull String first_name,
@@ -51,6 +53,41 @@ public class RWServices {
         TajiCabs.FIREBASE_TOKEN = firebaseToken;
     }
 
+    public String getEmailAdd() {
+        UserDetails userDetails = userDetailsDao.getUserDetails();
+        return (userDetails == null) ? "No Data Found" : userDetails.getEmail();
+    }
+
+    public String getFirstName() {
+        UserDetails userDetails = userDetailsDao.getUserDetails();
+        return (userDetails == null) ? "No Data Found" : userDetails.getFirstName();
+    }
+
+    public String getLastName() {
+        UserDetails userDetails = userDetailsDao.getUserDetails();
+        return (userDetails == null) ? "No Data Found" : userDetails.getLastName();
+    }
+
+    public String getPhoneNumber() {
+        UserDetails userDetails = userDetailsDao.getUserDetails();
+        return (userDetails == null) ? "No Data Found" : userDetails.getPhoneNumber();
+    }
+
+    public String getVehicleRegNo() {
+        VehicleDetails vehicleDetails = vehicleDetailsDao.getVehicleDetails();
+        return (vehicleDetails == null) ? "No Data Found" : vehicleDetails.getVehicleRegNo();
+    }
+
+    public String getVehicleMake() {
+        VehicleDetails vehicleDetails = vehicleDetailsDao.getVehicleDetails();
+        return (vehicleDetails == null) ? "No Data Found" : vehicleDetails.getVehicleMake();
+    }
+
+    public String getVehicleModel() {
+        VehicleDetails vehicleDetails = vehicleDetailsDao.getVehicleDetails();
+        return (vehicleDetails == null) ? "No Data Found" : vehicleDetails.getVehicleModel();
+    }
+
     public void createTripRequest(@NonNull String trip_id, @NonNull String origin_name, @NonNull String origin_lat,
         @NonNull String origin_lng, @NonNull String destination_name, @NonNull String destination_lat,
         @NonNull String destination_lng, @NonNull String passenger_name, @NonNull String passenger_phone,
@@ -66,20 +103,43 @@ public class RWServices {
 
     public String getActiveTrip() {
         TripDetails tripDetails = tripDetailsDao.getActiveTripDetails();
+        return (tripDetails == null) ? "No Data Found" : tripDetails.getTrip_id();
+    }
 
-        String tripId = (tripDetails == null) ? "No Data Found" : tripDetails.getTrip_id();
-        String originName = (tripDetails == null) ? "No Data Found" : tripDetails.getOrigin_name();
-        String originLat = (tripDetails == null) ? "No Data Found" : tripDetails.getOrigin_lat();
-        String originLng = (tripDetails == null) ? "No Data Found" : tripDetails.getOrigin_lng();
-        String destinationName = (tripDetails == null) ? "No Data Found" : tripDetails.getDestination_name();
-        String detinsationLat = (tripDetails == null) ? "No Data Found" : tripDetails.getDestination_lat();
-        String destinationLng = (tripDetails == null) ? "No Data Found" : tripDetails.getDestination_lng();
-        String passengerName = (tripDetails == null) ? "No Data Found" : tripDetails.getPassenger_name();
-        String passengerPhone = (tripDetails == null) ? "No Data Found" : tripDetails.getPassenger_phone();
-        String tripDistance = (tripDetails == null) ? "No Data Found" : tripDetails.getTrip_distance();
-        String tripCost = (tripDetails == null) ? "No Data Found" : tripDetails.getTrip_cost();
+    public void startTripUpdate(String tripId) {
+        TripDetails tripDetails = tripDetailsDao.getTripDetails(tripId);
 
-        return tripId;
+        if (tripDetails != null) {
+            tripDetails.trip_state = "I";
+
+            tripDetailsDao.updateTripDetails(tripDetails);
+        }
+    }
+
+    public void endTripUpdate(String tripId) {
+        TripDetails tripDetails = tripDetailsDao.getTripDetails(tripId);
+
+        if (tripDetails != null) {
+            tripDetails.trip_state = "E";
+
+            tripDetailsDao.updateTripDetails(tripDetails);
+        }
+    }
+
+    public void addTaxiVehicle(@NonNull String vehicleMake, @NonNull String vehicleModel,
+                               @NonNull String yearOfManuf, @NonNull String vehicleRegNo,
+                               @NonNull String vehicleColor, @NonNull String seatingCapacity) {
+
+        final String vehicleId = UUID.randomUUID().toString();
+        VehicleDetails vehicleDetails = new VehicleDetails(vehicleId, vehicleRegNo, vehicleMake, vehicleModel,
+                yearOfManuf, vehicleColor, seatingCapacity);
+
+        new createTaxiAsyncTask(vehicleDetailsDao).execute(vehicleDetails);
+    }
+
+    public String getTaxiRegNo() {
+        VehicleDetails vehicleDetails = vehicleDetailsDao.getVehicleDetails();
+        return (vehicleDetails == null) ? "No Data Found" : vehicleDetails.getVehicleRegNo();
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -123,23 +183,22 @@ public class RWServices {
         }
     }
 
-    public void startTripUpdate(String tripId) {
-        TripDetails tripDetails = tripDetailsDao.getTripDetails(tripId);
+    @SuppressLint("StaticFieldLeak")
+    private class createTaxiAsyncTask extends AsyncTask<VehicleDetails, Void, Void> {
+        VehicleDetailsDao vehicleDetailsDao;
 
-        if (tripDetails != null) {
-            tripDetails.trip_state = "I";
-
-            tripDetailsDao.updateTripDetails(tripDetails);
+        private createTaxiAsyncTask(VehicleDetailsDao vehicleDetailsDao) {
+            this.vehicleDetailsDao = vehicleDetailsDao;
         }
-    }
 
-    public void endTripUpdate(String tripId) {
-        TripDetails tripDetails = tripDetailsDao.getTripDetails(tripId);
+        @Override
+        protected Void doInBackground(VehicleDetails... vehicleDetails) {
+            vehicleDetailsDao.addVehicle(vehicleDetails[0]);
+            return null;
+        }
 
-        if (tripDetails != null) {
-            tripDetails.trip_state = "E";
-
-            tripDetailsDao.updateTripDetails(tripDetails);
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
         }
     }
 }

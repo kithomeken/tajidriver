@@ -8,7 +8,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {UserDetails.class, TripDetails.class}, version = 1)
+@Database(entities = {UserDetails.class, TripDetails.class, VehicleDetails.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase INSTANCE;
     private static final String DB_NAME = "appDatabase_driver.db";
@@ -36,4 +36,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDetailsDao userDetailsDao();
 
     public abstract TripDetailsDao tripDetailsDao();
+
+    public abstract VehicleDetailsDao vehicleDetailsDao();
 }

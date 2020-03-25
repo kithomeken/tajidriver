@@ -5,7 +5,7 @@
     android:id="@+id/tripDetails"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
+    android:background="@android:color/darker_gray"
     android:orientation="vertical"
     android:visibility="visible"
     app:behavior_hideable="false"

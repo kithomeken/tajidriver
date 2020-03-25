@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:screenOrientation="portrait"
+    android:orientation="vertical"
+    tools:context=".auth.SignIn">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/vehicle_setup" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="-4dp"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true"
+        android:weightSum="10">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5.5" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.75"
+            android:paddingStart="@dimen/dim_20"
+            android:paddingEnd="@dimen/dim_20">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/black"
+                android:text="@string/set_up_your_taxi"
+                android:textStyle="bold"
+                android:gravity="start"
+                android:textSize="@dimen/dim_25"
+                tools:ignore="SpUsage" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.5"
+            android:paddingStart="@dimen/dim_20"
+            android:paddingEnd="@dimen/dim_20">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/dark_grey"
+                android:lineSpacingExtra="@dimen/dim_05"
+                android:text="@string/welcome_long_text"
+                android:textStyle="bold"
+                android:gravity="start"
+                tools:ignore="SpUsage" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2.25"
+            android:padding="@dimen/dim_15"
+            android:weightSum="2"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1.25"
+                tools:ignore="NestedWeights">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/addVehicle"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:background="@drawable/green_round_button"
+                    android:paddingStart="@dimen/dim_40"
+                    android:paddingEnd="@dimen/dim_40"
+                    android:text="Setup Taxi"
+                    android:textColor="@color/white" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/skipSetup"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:layout_gravity="end"
+                android:paddingStart="@dimen/dim_15"
+                android:paddingEnd="@dimen/dim_15"
+                android:layout_marginEnd="@dimen/dim_10"
+                tools:ignore="NestedWeights">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:text="@string/skip_setup"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    tools:ignore="SpUsage" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

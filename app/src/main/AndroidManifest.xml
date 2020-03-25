@@ -16,37 +16,61 @@
         android:roundIcon="@mipmap/ic_taji_cabs_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity
+            android:name=".settings.Settings"
+            android:parentActivityName=".home.Home"
+            android:theme="@style/AppTheme.GreenTop" />
         <activity
             android:name=".app.App"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".home.Home"
-            android:theme="@style/AppTheme.TransparentActionBar"/>
+        <activity
+            android:name=".home.Home"
+            android:theme="@style/AppTheme.TransparentActionBar" />
         <activity
             android:name=".auth.SignUp"
             android:parentActivityName=".auth.SignIn"
-            android:theme="@style/AppTheme.TransparentActionBar"/>
+            android:theme="@style/AppTheme.TransparentActionBar" />
         <activity
             android:name=".auth.SignIn"
-            android:theme="@style/AppTheme.TajiNoActionBar"/>
+            android:theme="@style/AppTheme.TajiNoActionBar" />
+        <activity
+            android:name=".home.Profile"
+            android:parentActivityName=".home.Home"
+            android:theme="@style/AppTheme.GreenTop" />
+        <activity
+            android:name=".app.TaxiSetUp"
+            android:theme="@style/AppTheme.TajiNoActionBar" />
+        <activity
+            android:name=".taxi.AddTaxi"
+            android:parentActivityName=".home.Home"
+            android:theme="@style/AppTheme.GreenTop" />
+        <activity
+            android:name=".taxi.TaxiManagement"
+            android:theme="@style/AppTheme.GreenTop" />
+        <activity
+            android:name=".app.FinishSetup"
+            android:theme="@style/AppTheme.GreenTop" />
+        <activity android:name=".settings.UserProfile"
+            android:parentActivityName=".settings.Settings"
+            android:theme="@style/AppTheme.GreenTop"/>
+        <activity android:name=".settings.PrivacyPolicy"
+            android:parentActivityName=".settings.Settings"
+            android:theme="@style/AppTheme.GreenTop"/>
 
-
-
-
+        <!-- OLD SCREENS -->
         <activity
             android:name=".driver.DriverHome"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".configuration.StartApp"
-            android:theme="@style/SplashTheme">
-
-        </activity>
+            android:theme="@style/SplashTheme" />
         <activity
             android:name=".driver.SignUpActivity"
             android:theme="@style/AppTheme.NoActionBar" />

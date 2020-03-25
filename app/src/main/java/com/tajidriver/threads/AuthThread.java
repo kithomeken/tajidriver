@@ -41,6 +41,8 @@ public class AuthThread extends Thread {
     }
 
     public void hideProgressDialog() {
+        Log.e(TAG, "Cancelling Auth Thread");
+
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }

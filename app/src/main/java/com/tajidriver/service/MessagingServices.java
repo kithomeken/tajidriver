@@ -61,7 +61,7 @@ public class MessagingServices extends FirebaseMessagingService implements IRequ
         assert requestType != null;
         switch (requestType) {
             case "701":
-                sendNotification(remoteMessage.getData());
+//                sendNotification(remoteMessage.getData());
             break;
 
             case "702":
