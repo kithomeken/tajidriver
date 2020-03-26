@@ -11,6 +11,6 @@ public class Constants {
 
     public static final String TAXI_CHECK = "/taji/firebase/vehicle/check";
     public static final String REGISTER_TAXI = "/taji/firebase/vehicle/add";
-
+    public static final String TAXI_DETAILS = "/taji/firebase/taxi/details";
 
 }

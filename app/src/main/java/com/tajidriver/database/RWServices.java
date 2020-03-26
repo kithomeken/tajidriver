@@ -73,6 +73,11 @@ public class RWServices {
         return (userDetails == null) ? "No Data Found" : userDetails.getPhoneNumber();
     }
 
+    public String getFirebaseToken() {
+        UserDetails userDetails = userDetailsDao.getUserDetails();
+        return (userDetails == null) ? "No Data Found" : userDetails.getFirebaseToken();
+    }
+
     public String getVehicleRegNo() {
         VehicleDetails vehicleDetails = vehicleDetailsDao.getVehicleDetails();
         return (vehicleDetails == null) ? "No Data Found" : vehicleDetails.getVehicleRegNo();
@@ -127,8 +132,8 @@ public class RWServices {
     }
 
     public void addTaxiVehicle(@NonNull String vehicleMake, @NonNull String vehicleModel,
-                               @NonNull String yearOfManuf, @NonNull String vehicleRegNo,
-                               @NonNull String vehicleColor, @NonNull String seatingCapacity) {
+       @NonNull String yearOfManuf, @NonNull String vehicleRegNo,
+       @NonNull String vehicleColor, @NonNull String seatingCapacity) {
 
         final String vehicleId = UUID.randomUUID().toString();
         VehicleDetails vehicleDetails = new VehicleDetails(vehicleId, vehicleRegNo, vehicleMake, vehicleModel,

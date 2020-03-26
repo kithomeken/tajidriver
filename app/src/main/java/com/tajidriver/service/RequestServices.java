@@ -11,6 +11,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import com.tajidriver.database.AppDatabase;
+import com.tajidriver.database.RWServices;
 import com.tajidriver.global.Constants;
 import com.tajidriver.global.Variables;
 
@@ -47,11 +49,20 @@ public class RequestServices {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+
+                AppDatabase appDatabase = AppDatabase.getDatabase(context);
+                RWServices rwServices = new RWServices(appDatabase);
+
+                String vehicleMake = rwServices.getVehicleMake();
+                String vehicleModel = rwServices.getVehicleModel();
+                String vehicleRegNo = rwServices.getVehicleRegNo();
+                String vehicleDesc = vehicleMake + " " + vehicleModel;
+
                 params.put("name", Variables.ACCOUNT_NAME);
                 params.put("request_type", rType);
                 params.put("driver_phone", Variables.ACCOUNT_PHONE);
-                params.put("reg_no", Variables.VEHICLE_REGNO);
-                params.put("vehicle_make", Variables.VEHICLE_MAKE);
+                params.put("reg_no", vehicleRegNo);
+                params.put("vehicle_make", vehicleDesc);
                 params.put("passenger_phone", Variables.PASSENGER_PHONE);
 
                 Log.d(TAG, "=====================================" + params);

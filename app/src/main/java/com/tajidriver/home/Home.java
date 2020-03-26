@@ -249,6 +249,10 @@ public class Home extends AppCompatActivity implements
                             PASSENGER_NAME, PASSENGER_PHONE, TRIP_DISTANCE, TRIP_COST,
                             " ", " ", "A");
 
+                    Variables.VEHICLE_REGNO = rwServices.getVehicleRegNo();
+                    Variables.VEHICLE_MAKE = rwServices.getVehicleMake();
+                    rwServices.getUserDetails();
+
                     RequestServices requestServices = new RequestServices(getApplicationContext());
                     requestServices.acceptRide();
 
