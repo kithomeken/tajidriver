@@ -33,7 +33,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.75"
+            android:layout_weight="1.5"
             android:paddingStart="@dimen/dim_20"
             android:paddingEnd="@dimen/dim_20">
 
@@ -42,9 +42,9 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:textColor="@color/black"
-                android:text="@string/set_up_your_taxi"
+                android:text="@string/account_setup_complete"
                 android:textStyle="bold"
-                android:gravity="start"
+                android:gravity="center"
                 android:textSize="@dimen/dim_25"
                 tools:ignore="SpUsage" />
 
@@ -53,7 +53,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:paddingStart="@dimen/dim_20"
             android:paddingEnd="@dimen/dim_20">
 
@@ -63,9 +63,9 @@
                 android:layout_centerInParent="true"
                 android:textColor="@color/dark_grey"
                 android:lineSpacingExtra="@dimen/dim_05"
-                android:text="@string/welcome_long_text"
+                android:text="@string/welcome_back_to_taji_driver"
                 android:textStyle="bold"
-                android:gravity="start"
+                android:gravity="center"
                 tools:ignore="SpUsage" />
 
         </RelativeLayout>
@@ -73,7 +73,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2.25"
+            android:layout_weight="2"
             android:padding="@dimen/dim_15"
             android:weightSum="2"
             android:orientation="vertical">
@@ -85,40 +85,17 @@
                 tools:ignore="NestedWeights">
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/addVehicle"
+                    android:id="@+id/finishSetUp"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:visibility="visible"
                     android:layout_centerInParent="true"
                     android:layout_gravity="center"
-                    android:background="@drawable/green_round_button"
+                    android:background="@drawable/borderline"
                     android:paddingStart="@dimen/dim_40"
                     android:paddingEnd="@dimen/dim_40"
-                    android:text="Setup Taxi"
-                    android:textColor="@color/white" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/skipSetup"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="0.75"
-                android:layout_gravity="end"
-                android:paddingStart="@dimen/dim_15"
-                android:paddingEnd="@dimen/dim_15"
-                android:layout_marginEnd="@dimen/dim_10"
-                tools:ignore="NestedWeights">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:text="@string/skip_setup"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    tools:ignore="SpUsage" />
+                    android:text="Finish"
+                    android:textColor="@color/colorPrimaryDark" />
 
             </RelativeLayout>
 

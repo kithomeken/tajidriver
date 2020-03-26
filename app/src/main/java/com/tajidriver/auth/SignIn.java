@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,16 +31,20 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import com.tajidriver.R;
+import com.tajidriver.app.OnBoardingUI;
 import com.tajidriver.configuration.Firebase;
 import com.tajidriver.database.AppDatabase;
 import com.tajidriver.database.RWServices;
 import com.tajidriver.database.UserDetails;
 import com.tajidriver.database.UserDetailsDao;
+import com.tajidriver.database.VehicleDetails;
+import com.tajidriver.database.VehicleDetailsDao;
 import com.tajidriver.driver.DriverHome;
 import com.tajidriver.global.Constants;
 import com.tajidriver.global.Variables;
 import com.tajidriver.service.IRequestListener;
 import com.tajidriver.service.MessagingServices;
+import com.tajidriver.threads.AuthThread;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,21 +70,27 @@ public class SignIn extends Firebase {
     private Button accountSignIn;
 
     private FirebaseAuth firebaseAuth;
-    private ProgressBar progressBar;
-    private AppDatabase appDatabase;
     private Context context;
     private UserDetailsDao userDetailsDao;
+    private VehicleDetailsDao vehicleDetailsDao;
+
+    private Handler handler = new Handler();
+    private AuthThread authThread;
+    private Thread mainThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.auth_sign_in);
 
+        Variables.ACTIVITY_STATE = 0;
+        authThread = new AuthThread(SignIn.this, "Authenticating");
+
         firebaseAuth = FirebaseAuth.getInstance();
-        progressBar = findViewById(R.id.progressBar);
-        appDatabase = AppDatabase.getDatabase(this);
+        AppDatabase appDatabase = AppDatabase.getDatabase(this);
         context = getApplicationContext();
         userDetailsDao = appDatabase.userDetailsDao();
+        vehicleDetailsDao = appDatabase.vehicleDetailsDao();
 
         // Relative Layout Declarations
         relativeLayoutDeclaration();
@@ -166,9 +178,9 @@ public class SignIn extends Firebase {
         }
 
         Variables.ACTIVITY_STATE = 1;
-        progressBar.setVisibility(View.VISIBLE);
         accountSignIn.setVisibility(View.GONE);
         authFailed.setVisibility(View.GONE);
+        progressThread();
 
         final String email = accountEmail();
         String password = accountPassword();
@@ -187,7 +199,6 @@ public class SignIn extends Firebase {
                     if (!task.isSuccessful()) {
                         Log.e(TAG, " getInstanceId failed", task.getException());
                         Variables.ACTIVITY_STATE = 0;
-                        progressBar.setVisibility(View.GONE);
                         accountSignIn.setVisibility(View.VISIBLE);
 
                         return;
@@ -198,8 +209,11 @@ public class SignIn extends Firebase {
                     // Get Account Details
                     accountSetUp(firebaseToken);
 
+                    // Get Taxi Vehicle Details
+                    getTaxiDetails(accountEmail());
+
                     // Update Firebase Token
-                    updateFirebaseToken(firebaseToken);
+                    updateFirebaseToken(firebaseToken, accountEmail());
                     }
                 });
             } else {
@@ -215,7 +229,6 @@ public class SignIn extends Firebase {
             }
 
             Variables.ACTIVITY_STATE = 0;
-            progressBar.setVisibility(View.GONE);
             accountSignIn.setVisibility(View.VISIBLE);
             }
         });
@@ -254,13 +267,69 @@ public class SignIn extends Firebase {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "Volley Error: " + error.getMessage());
+                FirebaseAuth.getInstance().signOut();
+                authFailed.setVisibility(View.VISIBLE);
+
+                String failed = "Error signing you into your Taji Driver account. Kindly check your internet connectivity";
+                accountError.setText(failed);
+
+                Variables.ACTIVITY_STATE = 0;
+                // End Main Thread
+                authThread.hideProgressDialog();
             }
         });
 
         Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
-    private void updateFirebaseToken(final String firebaseToken) {
+    private void getTaxiDetails(String emailAdd) {
+        String stringUrl = Constants.API_HEADER + Constants.TAXI_DETAILS + "?email=" + emailAdd;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, stringUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            Log.e(TAG, "JSON Object: " + jsonObject);
+
+                            String vehicleBrand = jsonObject.getString("make");
+                            String vehicleModel = jsonObject.getString("model");
+                            String vehicleYear  = jsonObject.getString("year");
+                            String vehicleRegNo = jsonObject.getString("reg_no");
+                            String vehicleColor = jsonObject.getString("color");
+                            String vehicleCap   = jsonObject.getString("seating_capacity");
+
+                            // Add Entries to Application Database
+                            addTaxiVehicle(vehicleBrand, vehicleModel, vehicleYear, vehicleRegNo,
+                                    vehicleColor, vehicleCap);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "STACKTRACE: " + e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Volley Error: " + error.getMessage());
+
+                        FirebaseAuth.getInstance().signOut();
+                        authFailed.setVisibility(View.VISIBLE);
+
+                        String failed = "Error signing you into your Taji Driver account. Kindly check your internet connectivity";
+                        accountError.setText(failed);
+
+                        Variables.ACTIVITY_STATE = 0;
+                        // End Main Thread
+                        authThread.hideProgressDialog();
+                    }
+                });
+
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
+    }
+
+    private void updateFirebaseToken(final String firebaseToken, final String emailAdd) {
         // Update Firebase Token on Sign In
         RequestQueue queue = Volley.newRequestQueue(context);
         String tajiUrl = Constants.API_HEADER + Constants.UPDATE_FIREBASE_TOKEN;
@@ -275,13 +344,23 @@ public class SignIn extends Firebase {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "VOLLEY ERROR: " + error.getMessage());
+
+                FirebaseAuth.getInstance().signOut();
+                authFailed.setVisibility(View.VISIBLE);
+
+                String failed = "Error signing you into your Taji Driver account. Kindly check your internet connectivity";
+                accountError.setText(failed);
+
+                Variables.ACTIVITY_STATE = 0;
+                // End Main Thread
+                authThread.hideProgressDialog();
             }
         }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put("token", firebaseToken);
-                params.put("email", ACCOUNT_EMAIL);
+                params.put("email", emailAdd);
 
                 return params;
             }
@@ -310,14 +389,44 @@ public class SignIn extends Firebase {
         finishSignIn();
     }
 
-    private void finishSignIn(){
-        Intent intent = new Intent(SignIn.this, DriverHome.class);
-        startActivity(intent);
+    public void addTaxiVehicle(@NonNull String vehicleMake, @NonNull String vehicleModel,
+        @NonNull String yearOfManuf, @NonNull String vehicleRegNo,
+        @NonNull String vehicleColor, @NonNull String seatingCapacity) {
 
-        Variables.ACTIVITY_STATE = 0;
-        progressBar.setVisibility(View.GONE);
+        final String vehicleId = UUID.randomUUID().toString();
+        VehicleDetails vehicleDetails = new VehicleDetails(vehicleId, vehicleRegNo, vehicleMake, vehicleModel,
+                yearOfManuf, vehicleColor, seatingCapacity);
+
+        vehicleDetailsDao.addVehicle(vehicleDetails);
+    }
+
+    private void finishSignIn(){
+        Intent intent = new Intent(SignIn.this, OnBoardingUI.class);
+        startActivity(intent);
         finish();
     }
+
+    public void progressThread() {
+        mainThread = new Thread() {
+            @Override
+            public void run() {
+                Looper.prepare();
+
+                // Update the progress bar
+                handler.post(new Runnable() {
+                    public void run() {
+                        if (!mainThread.interrupted()) {
+                            authThread.run();
+                            Log.e(TAG, "RUNNING THREAD");
+                        }
+                    }
+                });
+            }
+        };
+
+        mainThread.start();
+    }
+
 }
 
 

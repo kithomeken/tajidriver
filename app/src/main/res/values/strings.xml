@@ -140,5 +140,7 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="taxi_management">Taxi Management</string>
     <string name="terms_privacy_policy"><![CDATA[Terms & Privacy Policy]]></string>
+    <string name="account_setup_complete">Account Setup complete</string>
+    <string name="welcome_back_to_taji_driver">Welcome Back to Taji Driver</string>
 
 </resources>

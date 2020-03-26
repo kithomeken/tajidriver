@@ -50,15 +50,17 @@ public class LocationSharing {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+
+                AppDatabase appDatabase = AppDatabase.getDatabase(context);
+                RWServices rwServices = new RWServices(appDatabase);
+
+                String tripId = rwServices.getActiveTrip();
+                String firebaseToken = rwServices.getFirebaseToken();
+
                 params.put("request_type", requestType);
                 params.put("latitude", locationLat);
                 params.put("longitude", locationLng);
-                params.put("token", FIREBASE_TOKEN);
-
-                // Driver Activity State
-                AppDatabase appDatabase = AppDatabase.getDatabase(context);
-                RWServices rwServices = new RWServices(appDatabase);
-                String tripId = rwServices.getActiveTrip();
+                params.put("token", firebaseToken);
 
                 if (tripId.equalsIgnoreCase("No Data Found")) {
                     params.put("activity_state", "E");
