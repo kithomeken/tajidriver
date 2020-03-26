@@ -69,6 +69,7 @@ import com.tajidriver.directions.TajiDirections;
 import com.tajidriver.geolocation.LocationSharing;
 import com.tajidriver.global.Variables;
 import com.tajidriver.service.RequestServices;
+import com.tajidriver.settings.ContactUs;
 import com.tajidriver.settings.Settings;
 
 import java.util.Objects;
@@ -300,6 +301,13 @@ public class Home extends AppCompatActivity implements
                 intent = new Intent(this, SignIn.class);
                 startActivity(intent);
                 finish();
+            }
+        } else if (itemId == R.id.nav_contacts) {
+            if (Variables.ACTIVITY_STATE == 0) {
+                Variables.ACTIVITY_STATE = 1;
+
+                intent = new Intent(this, ContactUs.class);
+                startActivity(intent);
             }
         }
 

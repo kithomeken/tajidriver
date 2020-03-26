@@ -66,6 +66,7 @@
             android:parentActivityName=".settings.Settings"
             android:theme="@style/AppTheme.GreenTop" />
         <activity android:name=".settings.ContactUs"
+            android:parentActivityName=".home.Home"
             android:theme="@style/AppTheme.GreenTop"/>
         <activity android:name=".app.OnBoardingUI"
             android:theme="@style/AppTheme.TajiNoActionBar"/>

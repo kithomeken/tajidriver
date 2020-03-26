@@ -8,7 +8,7 @@
     android:background="@android:color/white"
     android:screenOrientation="portrait"
     android:orientation="vertical"
-    tools:context=".auth.SignIn">
+    tools:context=".settings.ContactUs">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -56,8 +56,8 @@
                 android:id="@+id/imageView2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/vehicle_setup" />
+                android:scaleType="fitCenter"
+                android:src="@drawable/contact_us" />
 
         </RelativeLayout>
 
