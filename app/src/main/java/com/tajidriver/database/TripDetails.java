@@ -11,7 +11,7 @@ public class TripDetails {
         @NonNull String origin_lng, @NonNull String destination_name, @NonNull String destination_lat,
         @NonNull String destination_lng, @NonNull String passenger_name, @NonNull String passenger_phone,
         @NonNull String trip_distance, @NonNull String trip_cost, @NonNull String final_destination,
-        @NonNull String trip_date, @NonNull String trip_state) {
+        @NonNull String trip_date, @NonNull String trip_state, String driver_name, String driver_phone) {
 
         this.trip_id = trip_id;
         this.origin_name = origin_name;
@@ -27,6 +27,9 @@ public class TripDetails {
         this.final_destination = final_destination;
         this.trip_date = trip_date;
         this.trip_state = trip_state;
+
+        this.driver_name = driver_name;
+        this.driver_phone = driver_phone;
     }
 
     @PrimaryKey/*(autoGenerate = true)*/
@@ -85,6 +88,12 @@ public class TripDetails {
     @ColumnInfo(name = "trip_state")
     @NonNull
     public String trip_state;
+
+    @ColumnInfo(name = "driver_name")
+    public String driver_name;
+
+    @ColumnInfo(name = "driver_phone")
+    public String driver_phone;
 
     @NonNull
     public String getTrip_id() {
@@ -154,5 +163,13 @@ public class TripDetails {
     @NonNull
     public String getTripState() {
         return trip_state;
+    }
+
+    public String getDriverName() {
+        return driver_name;
+    }
+
+    public String getDriverPhone() {
+        return driver_phone;
     }
 }

@@ -17,6 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity android:name=".auth.ForgotPassword"></activity>
+        <activity android:name=".trips.TripsActivity" />
         <activity
             android:name=".settings.Settings"
             android:parentActivityName=".home.Home"
@@ -65,12 +67,13 @@
             android:name=".settings.PrivacyPolicy"
             android:parentActivityName=".settings.Settings"
             android:theme="@style/AppTheme.GreenTop" />
-        <activity android:name=".settings.ContactUs"
+        <activity
+            android:name=".settings.ContactUs"
             android:parentActivityName=".home.Home"
-            android:theme="@style/AppTheme.GreenTop"/>
-        <activity android:name=".app.OnBoardingUI"
-            android:theme="@style/AppTheme.TajiNoActionBar"/>
-        <!-- OLD SCREENS -->
+            android:theme="@style/AppTheme.GreenTop" />
+        <activity
+            android:name=".app.OnBoardingUI"
+            android:theme="@style/AppTheme.TajiNoActionBar" /> <!-- OLD SCREENS -->
         <activity
             android:name=".driver.DriverHome"
             android:theme="@style/AppTheme.NoActionBar" />
