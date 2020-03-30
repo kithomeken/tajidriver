@@ -1,10 +1,13 @@
 package com.tajidriver.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+
+import java.util.List;
 
 @Dao
 public interface TripDetailsDao {
@@ -22,4 +25,7 @@ public interface TripDetailsDao {
 
     @Query("SELECT * FROM tripDetails WHERE trip_id = :tripId")
     TripDetails getTripDetails(String tripId);
+
+    @Query("SELECT * FROM tripDetails WHERE trip_state = 'E'")
+    LiveData<List<TripDetails>> getCompletedTrips();
 }

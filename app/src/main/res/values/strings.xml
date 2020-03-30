@@ -142,5 +142,8 @@
     <string name="terms_privacy_policy"><![CDATA[Terms & Privacy Policy]]></string>
     <string name="account_setup_complete">Account Setup complete</string>
     <string name="welcome_back_to_taji_driver">Welcome Back to Taji Driver</string>
+    <string name="forgot_password_text">Forgot Your email/password? Just input your email and you\\\'ll be one click away from resetting your password</string>
+    <string name="reset_account">RESET ACCOUNT</string>
+    <string name="recovery_success">Recovery Mail Successfully Sent</string>
 
 </resources>
