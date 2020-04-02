@@ -10,11 +10,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -24,6 +27,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -93,7 +97,7 @@ import static com.tajidriver.global.Variables.TRIP_DISTANCE;
 import static com.tajidriver.global.Variables.TRIP_ID;
 
 public class Home extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener , OnMapReadyCallback {
+        NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private static final String TAG = Home.class.getName();
 
@@ -113,7 +117,7 @@ public class Home extends AppCompatActivity implements
     private LocationRequest mLocationRequest;
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private final LatLng mDefaultLocation = new LatLng(-1.2833 , 36.8167);
+    private final LatLng mDefaultLocation = new LatLng(-1.2833, 36.8167);
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
 
@@ -206,7 +210,7 @@ public class Home extends AppCompatActivity implements
 
         CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams)
                 geoLocation.getLayoutParams();
-        layoutParams.setMargins(0, 0, 0,170);
+        layoutParams.setMargins(0, 0, 0, 170);
         geoLocation.setLayoutParams(layoutParams);
 
         // Show trip request Modal
@@ -217,7 +221,7 @@ public class Home extends AppCompatActivity implements
 
             layoutParams = (CoordinatorLayout.LayoutParams)
                     geoLocation.getLayoutParams();
-            layoutParams.setMargins(0, 0, 0,350 );
+            layoutParams.setMargins(0, 0, 0, 350);
             geoLocation.setLayoutParams(layoutParams);
 
             TextView passengerDetails, fromDisp, toDisp, distanceDisp, costDisp;
@@ -273,7 +277,7 @@ public class Home extends AppCompatActivity implements
 
                     CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams)
                             geoLocation.getLayoutParams();
-                    layoutParams.setMargins(0, 0, 0,170);
+                    layoutParams.setMargins(0, 0, 0, 170);
                     geoLocation.setLayoutParams(layoutParams);
                 }
             });
@@ -330,7 +334,7 @@ public class Home extends AppCompatActivity implements
 
         CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams)
                 geoLocation.getLayoutParams();
-        layoutParams.setMargins(0, 0, 0,400 );
+        layoutParams.setMargins(0, 0, 0, 400);
         geoLocation.setLayoutParams(layoutParams);
 
         // Populate Trip Details
@@ -423,6 +427,30 @@ public class Home extends AppCompatActivity implements
 
                 googleMap.clear();
                 showEndTripPopUp(view, stringCost);
+            }
+        });
+
+        ImageView phoneCall = findViewById(R.id.phoneCall);
+        phoneCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String telephone = "tel:" + passengerPhone;
+
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse(telephone));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    Activity#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for Activity#requestPermissions for more details.
+                        return;
+                    }
+                }
+                startActivity(callIntent);
             }
         });
     }

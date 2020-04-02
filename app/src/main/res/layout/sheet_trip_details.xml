@@ -209,6 +209,7 @@
                         tools:ignore="MissingConstraints">
 
                         <ImageView
+                            android:id="@+id/phoneCall"
                             android:layout_width="@dimen/dim_40"
                             android:layout_height="@dimen/dim_40"
                             android:scaleType="fitCenter"
