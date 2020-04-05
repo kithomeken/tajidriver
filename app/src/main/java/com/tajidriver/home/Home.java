@@ -75,6 +75,7 @@ import com.tajidriver.global.Variables;
 import com.tajidriver.service.RequestServices;
 import com.tajidriver.settings.ContactUs;
 import com.tajidriver.settings.Settings;
+import com.tajidriver.trips.TripsActivity;
 
 import java.util.Objects;
 
@@ -112,6 +113,7 @@ public class Home extends AppCompatActivity implements
 
     protected static final int overview = 0;
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    protected static final int REQUEST_PHONE_CALL = 0x1;
 
     private GoogleMap googleMap;
     private LocationRequest mLocationRequest;
@@ -170,7 +172,10 @@ public class Home extends AppCompatActivity implements
         TextView accountEmail = navHeaderView.findViewById(R.id.accountEmail);
 
         assert firebaseUser != null;
-        accountName.setText(ACCOUNT_NAME);
+        String firstName = rwServices.getFirstName();
+        String lastName = rwServices.getLastName();
+
+        accountName.setText(firstName + " " + lastName);
         accountEmail.setText(firebaseUser.getEmail());
 
         if (savedInstanceState != null) {
@@ -259,7 +264,7 @@ public class Home extends AppCompatActivity implements
                     rwServices.getUserDetails();
 
                     RequestServices requestServices = new RequestServices(getApplicationContext());
-                    requestServices.acceptRide();
+                    requestServices.acceptRide(TRIP_ID);
 
                     // Show Trip Details
                     showTripDetails();
@@ -296,6 +301,20 @@ public class Home extends AppCompatActivity implements
                 intent = new Intent(this, Settings.class);
                 startActivity(intent);
             }
+        } else if (itemId == R.id.nav_contacts) {
+            if (Variables.ACTIVITY_STATE == 0) {
+                Variables.ACTIVITY_STATE = 1;
+
+                intent = new Intent(this, ContactUs.class);
+                startActivity(intent);
+            }
+        } else if (itemId == R.id.nav_trips) {
+            if (Variables.ACTIVITY_STATE == 0) {
+                Variables.ACTIVITY_STATE = 1;
+
+                intent = new Intent(this, TripsActivity.class);
+                startActivity(intent);
+            }
         } else if (itemId == R.id.sign_out) {
             if (Variables.ACTIVITY_STATE == 0) {
                 Variables.ACTIVITY_STATE = 1;
@@ -305,13 +324,6 @@ public class Home extends AppCompatActivity implements
                 intent = new Intent(this, SignIn.class);
                 startActivity(intent);
                 finish();
-            }
-        } else if (itemId == R.id.nav_contacts) {
-            if (Variables.ACTIVITY_STATE == 0) {
-                Variables.ACTIVITY_STATE = 1;
-
-                intent = new Intent(this, ContactUs.class);
-                startActivity(intent);
             }
         }
 
@@ -414,7 +426,7 @@ public class Home extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 TripDetailsDao tripDetailsDao = appDatabase.tripDetailsDao();
-                TripDetails tripDetails = tripDetailsDao.getActiveTripDetails();
+                TripDetails tripDetails = tripDetailsDao.getTripDetails(tripID);
                 String ended = "E";
 
                 if (tripDetails != null) {
@@ -423,7 +435,7 @@ public class Home extends AppCompatActivity implements
                 }
 
                 RequestServices requestServices = new RequestServices(getApplicationContext());
-                requestServices.endRide(passengerPhone, stringCost);
+                requestServices.endRide(passengerPhone, stringCost, tripID);
 
                 googleMap.clear();
                 showEndTripPopUp(view, stringCost);
@@ -447,7 +459,7 @@ public class Home extends AppCompatActivity implements
                         //                                          int[] grantResults)
                         // to handle the case where the user grants the permission. See the documentation
                         // for Activity#requestPermissions for more details.
-                        return;
+                        ActivityCompat.requestPermissions(Home.this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_CALL);
                     }
                 }
                 startActivity(callIntent);

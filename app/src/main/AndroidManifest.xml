@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -18,8 +18,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".auth.ForgotPassword"></activity>
-        <activity android:name=".trips.TripsActivity" />
+        <activity android:name=".settings.TermsAndConditions"
+            android:theme="@style/AppTheme.GreenTop"
+            android:parentActivityName=".app.TaxiSetUp"/>
+        <activity android:name=".auth.ForgotPassword"
+            android:theme="@style/AppTheme.TajiNoActionBar"
+            android:parentActivityName=".auth.SignIn"/>
+        <activity android:name=".trips.TripsActivity"
+            android:theme="@style/AppTheme.GreenTop"
+            android:parentActivityName=".home.Home"/>
         <activity
             android:name=".settings.Settings"
             android:parentActivityName=".home.Home"

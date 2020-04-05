@@ -45,7 +45,7 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.ViewHo
 
             holder.startPoint.setText(tripRequests.origin_name);
             holder.endPoint.setText(tripRequests.destination_name);
-            holder.driverName.setText(tripRequests.driver_name);
+            holder.driverName.setText(tripRequests.passenger_name);
             holder.distance.setText(tripRequests.trip_distance);
             holder.tripCost.setText(tripRequests.trip_cost);
 

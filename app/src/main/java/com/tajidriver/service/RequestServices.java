@@ -27,7 +27,7 @@ public class RequestServices {
         this.context = context;
     }
 
-    public void acceptRide() {
+    public void acceptRide(final String tripId) {
         RequestQueue queue = Volley.newRequestQueue(context);
         String tajiUrl = "https://taji.kennedykitho.me/taji/firebase/request-ride/accepted";
 
@@ -64,6 +64,7 @@ public class RequestServices {
                 params.put("reg_no", vehicleRegNo);
                 params.put("vehicle_make", vehicleDesc);
                 params.put("passenger_phone", Variables.PASSENGER_PHONE);
+                params.put("trip_id", tripId);
 
                 Log.d(TAG, "=====================================" + params);
 
@@ -122,7 +123,7 @@ public class RequestServices {
         queue.add(stringRequest);
     }
 
-    public void endRide(final String passengerPhone, final String tripCost) {
+    public void endRide(final String passengerPhone, final String tripCost, final String tripId) {
         RequestQueue queue = Volley.newRequestQueue(context);
         String tajiUrl = "https://taji.kennedykitho.me/taji/firebase/trip/end";
 
@@ -146,6 +147,7 @@ public class RequestServices {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("passenger_phone", passengerPhone);
                 params.put("cost", tripCost);
+                params.put("trip_id", tripId);
 
                 Log.d(TAG, "=====================================" + params);
 
