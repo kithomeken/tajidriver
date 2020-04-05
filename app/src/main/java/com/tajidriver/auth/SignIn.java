@@ -208,12 +208,6 @@ public class SignIn extends Firebase {
 
                     // Get Account Details
                     accountSetUp(firebaseToken);
-
-                    // Get Taxi Vehicle Details
-                    getTaxiDetails(accountEmail());
-
-                    // Update Firebase Token
-                    updateFirebaseToken(firebaseToken, accountEmail());
                     }
                 });
             } else {
@@ -236,7 +230,7 @@ public class SignIn extends Firebase {
     }
 
     private void accountSetUp(final String firebaseToken) {
-        String stringUrl = Constants.API_HEADER + Constants.FETCH_ACCOUNT_DETAILS + "?email=" + accountEmail;
+        String stringUrl = Constants.API_HEADER + Constants.FETCH_ACCOUNT_DETAILS + "?email=" + accountEmail();
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, stringUrl,
         new Response.Listener<String>() {
@@ -257,6 +251,9 @@ public class SignIn extends Firebase {
                     // Add Entries to Application Database
                     createUser(ACCOUNT_EMAIL, ACCOUNT_FNAME, ACCOUNT_LNAME, ACCOUNT_PHONE,
                             firebaseToken, VEHICLE_MAKE, VEHICLE_REGNO);
+
+                    // Get Taxi Vehicle Details
+                    getTaxiDetails(accountEmail(), firebaseToken);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.e(TAG, "STACKTRACE: " + e.getMessage());
@@ -282,7 +279,7 @@ public class SignIn extends Firebase {
         Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
-    private void getTaxiDetails(String emailAdd) {
+    private void getTaxiDetails(String emailAdd, final String firebaseToken) {
         String stringUrl = Constants.API_HEADER + Constants.TAXI_DETAILS + "?email=" + emailAdd;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, stringUrl,
@@ -303,6 +300,9 @@ public class SignIn extends Firebase {
                             // Add Entries to Application Database
                             addTaxiVehicle(vehicleBrand, vehicleModel, vehicleYear, vehicleRegNo,
                                     vehicleColor, vehicleCap);
+
+                            // Update Firebase Token
+                            updateFirebaseToken(accountEmail(), firebaseToken);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Log.e(TAG, "STACKTRACE: " + e.getMessage());
@@ -329,7 +329,7 @@ public class SignIn extends Firebase {
         Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
-    private void updateFirebaseToken(final String firebaseToken, final String emailAdd) {
+    private void updateFirebaseToken(final String emailAdd, final String firebaseToken) {
         // Update Firebase Token on Sign In
         RequestQueue queue = Volley.newRequestQueue(context);
         String tajiUrl = Constants.API_HEADER + Constants.UPDATE_FIREBASE_TOKEN;
@@ -339,6 +339,8 @@ public class SignIn extends Firebase {
                     @Override
                     public void onResponse(String response) {
                         Log.e(TAG, "RESPONSE: " + response);
+
+                        finishSignIn();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -385,8 +387,6 @@ public class SignIn extends Firebase {
                 phone_number, firebaseToken, vehicleMake, vehicleRegNo);
 
         userDetailsDao.createNewUser(userDetails);
-
-        finishSignIn();
     }
 
     public void addTaxiVehicle(@NonNull String vehicleMake, @NonNull String vehicleModel,
@@ -401,6 +401,10 @@ public class SignIn extends Firebase {
     }
 
     private void finishSignIn(){
+        // End Main Thread
+        Variables.ACTIVITY_STATE = 0;
+        authThread.hideProgressDialog();
+
         Intent intent = new Intent(SignIn.this, OnBoardingUI.class);
         startActivity(intent);
         finish();

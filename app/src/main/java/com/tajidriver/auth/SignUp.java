@@ -73,7 +73,7 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.auth_sign_up);
 
-        authThread = new AuthThread(SignUp.this, "Creating New User");
+        authThread = new AuthThread(SignUp.this, "Creating Your Account");
         firebaseAuth = FirebaseAuth.getInstance();
         AppDatabase appDatabase = AppDatabase.getDatabase(this);
         rwServices = new RWServices(appDatabase);
@@ -159,9 +159,9 @@ public class SignUp extends AppCompatActivity {
                             }
                         });
                 } else {
-                    Log.i(TAG, "Firebase Account Creation: Failed", task.getException());
+                    Log.e(TAG, "Firebase Account Creation: Failed -- " + task.getException().getLocalizedMessage());
                     authFailed.setVisibility(View.VISIBLE);
-                    accountError.setText(Objects.requireNonNull(task.getException()).getLocalizedMessage());
+                    accountError.setText(task.getException().getLocalizedMessage());
 
                     Variables.ACTIVITY_STATE = 0;
                     // End Main Thread
@@ -171,7 +171,7 @@ public class SignUp extends AppCompatActivity {
 
                 if (!task.isSuccessful()) {
                     authFailed.setVisibility(View.VISIBLE);
-                    accountError.setText(Objects.requireNonNull(task.getException()).getLocalizedMessage());
+                    accountError.setText(task.getException().getLocalizedMessage());
 
                     Variables.ACTIVITY_STATE = 0;
                     // End Main Thread
